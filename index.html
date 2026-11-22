@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prottoy — Product Designer</title>
+  <meta name="description" content="MD Rakkibul Islam Prottoy is a product designer with 2+ years of experience in UI/UX design, brand and technology." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=3.10" />
+  <link rel="stylesheet" href="project.css?v=28" />
+
+  <!-- every load / refresh starts at the hero: no remembered scroll position, no #section jump -->
+  <script>
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    window.scrollTo(0, 0);
+  </script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body class="is-loading">
+
+  <!-- Blue duotone filter used by the intro card -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="duo" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values=".299 .587 .114 0 0  .299 .587 .114 0 0  .299 .587 .114 0 0  0 0 0 1 0" />
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0 0.84" />
+        <feFuncG type="table" tableValues="0.086 0.86" />
+        <feFuncB type="table" tableValues="0.925 1" />
+      </feComponentTransfer>
+    </filter>
+  </svg>
+
+  <!-- ================= Loader ================= -->
+  <div class="loader-veil" id="loaderVeil" aria-hidden="true"></div>
+  <div class="loader" id="loader" aria-hidden="true">
+    <span class="lb lb--track" id="lbTrack"></span>
+    <span class="lb lb--piece" id="pieceA"></span>
+    <span class="lb lb--piece" id="pieceB"></span>
+    <div class="loader__count" id="loaderCount"></div>
+  </div>
+
+  <!-- Cursor trail (page) + flying card (intro → reel) -->
+  <canvas id="trail" aria-hidden="true"></canvas>
+  <canvas id="flyer" aria-hidden="true"></canvas>
+
+  <!-- ================= Header ================= -->
+  <header class="header" id="header">
+    <a href="#top" class="logo" aria-label="Prottoy home">
+      <span class="logo__mark"></span>PROTTOY
+    </a>
+    <p class="header__tagline">
+      <span class="line"><span>Product designer with 2+ years</span></span>
+      <span class="line"><span>of experience in UI/UX design,</span></span>
+      <span class="line"><span>brand and technology.</span></span>
+    </p>
+    <div class="header__actions">
+      <button class="icon-btn" id="soundBtn" aria-label="Play ambient music" aria-pressed="false" title="Sound on / off">
+        <svg viewBox="0 0 24 18" aria-hidden="true"><path id="soundWave" d="M3 9 L21 9" /></svg>
+      </button>
+      <a href="#contact" class="pill pill--dark pill--talk">
+        <span class="pill__arrow">→</span>
+        <span class="pill__roll"><span>LET'S TALK</span><span>LET'S TALK</span></span>
+        <span class="pill__dot"></span>
+      </a>
+      <button class="pill pill--light" id="menuBtn" aria-expanded="false" aria-controls="menu">
+        <span class="pill__roll"><span>MENU</span><span>CLOSE</span></span>
+        <span class="pill__dots"><i></i><i></i></span>
+      </button>
+    </div>
+
+    <nav class="menu" id="menu" aria-label="Main">
+      <a href="#top"><span>Home</span><b>→</b></a>
+      <a href="#about"><span>About</span><b>→</b></a>
+      <a href="#work"><span>Projects</span><b>→</b></a>
+      <a href="#contact"><span>Contact</span><b>→</b></a>
+      <div class="menu__foot">
+        <p>Open to product design roles · 2026</p>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- ================= Hero ================= -->
+    <section class="hero">
+      <div class="hero__panel" id="heroPanel">
+        <canvas id="webgl"></canvas>
+      </div>
+      <div class="markers markers--hero">
+        <span class="mk">+</span><span class="mk">+</span>
+        <span class="markers__label" id="scrollLabel">SCROLL TO EXPLORE</span>
+        <span class="mk">+</span><span class="mk">+</span>
+      </div>
+    </section>
+
+    <!-- ================= Intro ================= -->
+    <section class="intro" id="about">
+      <svg class="tube" id="tube" aria-hidden="true">
+        <defs>
+          <linearGradient id="tubeGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="#0016ec" />
+            <stop offset=".6" stop-color="#0016ec" />
+            <stop offset="1" stop-color="#2b3fff" />
+          </linearGradient>
+        </defs>
+        <path class="tube__shadow" />
+        <path class="tube__base" />
+        <path class="tube__hl" />
+      </svg>
+
+      <h1 class="intro__title">
+        <span class="line line--indent"><span>Designing products,</span></span>
+        <span class="line"><span>people love to use</span></span>
+      </h1>
+
+      <div class="intro__grid">
+        <div class="intro__visual" id="introCard"><!-- slides injected by JS --></div>
+        <div class="intro__text">
+          <p class="fade-words">
+            I'm a product designer focused on problem solving through
+            user-centered design. I mainly work on web and SaaS products in
+            Figma, and I enjoy breaking complex problems into simple,
+            usable solutions, from landing pages to apps and dashboards.
+          </p>
+          <a href="#work" class="pill pill--white pill--approach">
+            <span class="pill__dot pill__dot--dark"></span>
+            <span class="pill__roll"><span>MY APPROACH</span><span>MY APPROACH</span></span>
+            <span class="pill__arrow pill__arrow--end">→</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= Showreel ================= -->
+    <section class="reel" id="reel">
+      <div class="reel__edge">
+        <div class="markers"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
+        <div class="ticker"><div class="ticker__track"></div></div>
+      </div>
+      <div class="reel__panel" id="reelPanel">
+        <div class="reel__media" id="reelMedia"><!-- slides injected by JS --></div>
+        <div class="reel__title">
+          <span class="reel__word" id="reelLeft">PLAY</span>
+          <button class="reel__play" aria-label="Play showreel"><span>▶</span></button>
+          <span class="reel__word" id="reelRight">REEL</span>
+        </div>
+      </div>
+      <div class="reel__edge">
+        <div class="markers"><span>+</span><span>+</span><span>+</span><span>+</span><span>+</span></div>
+        <div class="ticker ticker--rev"><div class="ticker__track"></div></div>
+      </div>
+    </section>
+
+    <!-- ================= Work ================= -->
+    <section class="work" id="work">
+      <div class="work__head">
+        <h2 class="section-title"><span class="line"><span>Featured Work</span></span></h2>
+        <p class="work__desc">Selected work from 2024–2025: landing pages, SaaS products, mobile apps and dashboards.</p>
+      </div>
+
+      <div class="work__grid">
+        <a href="#" class="project" data-slug="consultancy-firm">
+          <div class="project__media has-img" style="--c1:#13161a;--c2:#2a8f57">
+            <img src="assets/work/consultancy-firm/cover.jpg" alt="Consultancy Firm cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">PRODUCT DESIGN • PROFESSIONAL SERVICE • 2025</p>
+          <h3 class="project__title"><b>→</b>Consultancy Firm</h3>
+        </a>
+        <a href="#" class="project" data-slug="real-estate">
+          <div class="project__media has-img" style="--c1:#0d1a2a;--c2:#a4e34a">
+            <img src="assets/work/real-estate/cover.jpg" alt="Real Estate Landing cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI DESIGN • E-COMMERCE • 2025</p>
+          <h3 class="project__title"><b>→</b>Real Estate Landing</h3>
+        </a>
+        <a href="#" class="project" data-slug="sharedeal">
+          <div class="project__media has-img" style="--c1:#4bab25;--c2:#b5e39a">
+            <img src="assets/work/sharedeal/cover.jpg" alt="ShareDeal cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">PRODUCT DESIGN • SOCIAL E-COMMERCE • 2025</p>
+          <h3 class="project__title"><b>→</b>ShareDeal</h3>
+        </a>
+        <a href="#" class="project" data-slug="bebshapati">
+          <div class="project__media has-img" style="--c1:#16181c;--c2:#2563eb">
+            <img src="assets/work/bebshapati/cover.jpg" alt="Bebshapati cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI UX DESIGN • FINANCE • 2025</p>
+          <h3 class="project__title"><b>→</b>Bebshapati</h3>
+        </a>
+        <a href="#" class="project" data-slug="vida-ev">
+          <div class="project__media has-img" style="--c1:#121212;--c2:#ff6a1a">
+            <img src="assets/work/vida-ev/cover.jpg" alt="Vida EV cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">CASE STUDY • E-COMMERCE • 2025</p>
+          <h3 class="project__title"><b>→</b>Vida EV</h3>
+        </a>
+        <a href="#" class="project" data-slug="travella">
+          <div class="project__media has-img" style="--c1:#2a1e3a;--c2:#7d5fb0">
+            <img src="assets/work/travella/cover.jpg" alt="Travella cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI DESIGN • LIFESTYLE • 2024</p>
+          <h3 class="project__title"><b>→</b>Travella</h3>
+        </a>
+        <a href="#" class="project" data-slug="portfolio-website">
+          <div class="project__media has-img" style="--c1:#f26a1b;--c2:#ffd0b0">
+            <img src="assets/work/portfolio-website/cover.jpg" alt="Portfolio Website cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI UX • PORTFOLIO • 2025</p>
+          <h3 class="project__title"><b>→</b>Portfolio Website</h3>
+        </a>
+      </div>
+
+      <div class="work__more">
+        <a href="#" class="more-btn">
+          <span class="more-btn__dot" aria-hidden="true"></span>
+          <span class="more-btn__text">See all projects</span>
+          <span class="more-btn__arrow" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2.5 8h11m0 0L8.7 3.2M13.5 8l-4.8 4.8" /></svg></span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ================= Footer / Contact ================= -->
+    <footer class="footer" id="contact">
+      <div class="footer__panel">
+        <div class="footer__top">
+          <h2 class="footer__title">
+            <span class="line"><span>Got a product idea?</span></span>
+            <span class="line"><span>Let's make it real.</span></span>
+          </h2>
+          <a href="mailto:md.rakkibul38@gmail.com" class="pill pill--white pill--big magnetic">
+            <span class="pill__dot pill__dot--dark"></span>
+            <span class="pill__roll"><span>MD.RAKKIBUL38@GMAIL.COM</span><span>MD.RAKKIBUL38@GMAIL.COM</span></span>
+          </a>
+        </div>
+
+        <div class="footer__cols">
+          <div>
+            <p class="footer__label">Based in</p>
+            <p>Rajshahi, Bangladesh<br />Working worldwide</p>
+          </div>
+          <div>
+            <p class="footer__label">Social</p>
+            <a href="https://dribbble.com/rakkibul_islam" target="_blank" rel="noopener">Dribbble</a><a href="https://www.behance.net/mdrakkibul" target="_blank" rel="noopener">Behance</a><a href="https://www.linkedin.com/in/rakkibul-islam/" target="_blank" rel="noopener">LinkedIn</a><a href="https://94e84440-e373-4f25-97c3-3a86a65d8074.filesusr.com/ugd/d1d085_073a4bd10bd446a39430c7b0e70501ca.pdf" target="_blank" rel="noopener">Resume</a>
+          </div>
+          <div>
+            <p class="footer__label">Menu</p>
+            <a href="#top">Home</a><a href="#about">About</a><a href="#work">Projects</a>
+          </div>
+          <form class="newsletter" onsubmit="event.preventDefault(); this.classList.add('is-done');">
+            <p class="footer__label">Subscribe to my design notes</p>
+            <div class="newsletter__field">
+              <input type="email" placeholder="Your email" aria-label="Your email" required />
+              <button type="submit" aria-label="Subscribe">→</button>
+            </div>
+            <p class="newsletter__ok">Thanks! You're on the list.</p>
+          </form>
+        </div>
+
+        <div class="footer__word" aria-hidden="true">PROTTOY</div>
+
+        <div class="footer__bottom">
+          <p>© <span id="year"></span> MD Rakkibul Islam Prottoy. All rights reserved.</p>
+          <a href="#top">Back to top ↑</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script type="module" src="main.js?v=3.23"></script>
+  <script src="stories.js?v=11"></script>
+  <script src="stories-more.js?v=7"></script>
+  <script src="project.js?v=22"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+# Large source files kept only on this computer (GitHub refuses files over 100 MB)
+/*.mp4
+/*.zip
+
+# Not part of the website
+/port2/
+/.claude/
+
+# Earlier frozen versions (kept locally as backups)
+/v1/
+/v2/
+/v3/
+
+# Editor / OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+.audit-tmp.js

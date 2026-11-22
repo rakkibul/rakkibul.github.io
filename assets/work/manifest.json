@@ -1,0 +1,236 @@
+{
+ "consultancy-firm": [
+  {
+   "src": "assets/work/consultancy-firm/cover.jpg",
+   "w": 1400,
+   "h": 1622
+  },
+  {
+   "src": "assets/work/consultancy-firm/01.jpg",
+   "w": 3909,
+   "h": 1100
+  },
+  {
+   "src": "assets/work/consultancy-firm/02-0.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/consultancy-firm/02-1.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/consultancy-firm/02-2.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/consultancy-firm/03-0.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/consultancy-firm/03-1.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/consultancy-firm/03-2.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/consultancy-firm/04.jpg",
+   "w": 996,
+   "h": 1400
+  }
+ ],
+ "real-estate": [
+  {
+   "src": "assets/work/real-estate/cover.jpg",
+   "w": 1400,
+   "h": 1622
+  },
+  {
+   "src": "assets/work/real-estate/01.jpg",
+   "w": 5992,
+   "h": 1100
+  },
+  {
+   "src": "assets/work/real-estate/02-0.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/real-estate/02-1.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/real-estate/02-2.jpg",
+   "w": 2000,
+   "h": 1250
+  }
+ ],
+ "sharedeal": [
+  {
+   "src": "assets/work/sharedeal/cover.jpg",
+   "w": 1400,
+   "h": 1622
+  },
+  {
+   "src": "assets/work/sharedeal/01.jpg",
+   "w": 5992,
+   "h": 1100
+  },
+  {
+   "src": "assets/work/sharedeal/02.jpg",
+   "w": 2933,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/sharedeal/03.jpg",
+   "w": 2489,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/sharedeal/04-0.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/sharedeal/04-1.jpg",
+   "w": 2000,
+   "h": 1250
+  },
+  {
+   "src": "assets/work/sharedeal/04-2.jpg",
+   "w": 2000,
+   "h": 1250
+  }
+ ],
+ "bebshapati": [
+  {
+   "src": "assets/work/bebshapati/cover.jpg",
+   "w": 1400,
+   "h": 1622
+  },
+  {
+   "src": "assets/work/bebshapati/01.jpg",
+   "w": 2655,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/bebshapati/02.jpg",
+   "w": 2903,
+   "h": 1100
+  }
+ ],
+ "vida-ev": [
+  {
+   "src": "assets/work/vida-ev/cover.jpg",
+   "w": 1400,
+   "h": 1622
+  },
+  {
+   "src": "assets/work/vida-ev/01.jpg",
+   "w": 2240,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/02.jpg",
+   "w": 2240,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/03.jpg",
+   "w": 2240,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/04.jpg",
+   "w": 3036,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/05.jpg",
+   "w": 2156,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/06.jpg",
+   "w": 1768,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/07.jpg",
+   "w": 1054,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/08.jpg",
+   "w": 1325,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/09.jpg",
+   "w": 1325,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/10.jpg",
+   "w": 1007,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/11.jpg",
+   "w": 1007,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/12.jpg",
+   "w": 1482,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/vida-ev/13.jpg",
+   "w": 3943,
+   "h": 1100
+  }
+ ],
+ "travella": [
+  {
+   "src": "assets/work/travella/cover.jpg",
+   "w": 1400,
+   "h": 1622
+  },
+  {
+   "src": "assets/work/travella/01.jpg",
+   "w": 1680,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/travella/02.jpg",
+   "w": 1945,
+   "h": 1400
+  }
+ ],
+ "portfolio-website": [
+  {
+   "src": "assets/work/portfolio-website/cover.jpg",
+   "w": 1400,
+   "h": 1622
+  },
+  {
+   "src": "assets/work/portfolio-website/01.jpg",
+   "w": 2361,
+   "h": 1400
+  },
+  {
+   "src": "assets/work/portfolio-website/02.jpg",
+   "w": 2100,
+   "h": 1400
+  }
+ ]
+}
