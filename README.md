@@ -2,7 +2,7 @@
 
 Portfolio website of **MD Rakkibul Islam Prottoy**, a product designer working on UI/UX, brand and technology.
 
-**Live site:** https://mdrakkibul38-png.github.io/portfolio/
+**Live site:** https://rakkibul.github.io/
 
 ## What's inside
 
