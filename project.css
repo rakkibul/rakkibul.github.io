@@ -17,14 +17,46 @@
 .pv.is-dragging { cursor: grabbing; }
 .pv__bg { position: absolute; inset: 0; background: var(--pv-bg); opacity: 0; }
 
+/* while the grid zooms into / out of a card, the headings and card titles fade (--zf: 1 → 0) */
+#work.is-zoom .work__head,
+#work.is-zoom .project__tags,
+#work.is-zoom .project__title { filter: opacity(var(--zf, 1)); }
+
 /* ---------- v4: real project covers on the Featured Work cards ---------- */
 .project__media.has-img::after { opacity: 0; }
+/* the card keeps its original 16:10 size; the cover fills the full width, and each card is
+   framed on its main screen (laptop / phone / site) so the important part stays in view */
+.project__media.has-img { background: var(--c1); }
 .project__media img {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; object-position: 50% 18%;
+  object-fit: cover; object-position: 50% var(--focus, 50%);
   transition: transform 1s var(--ease);
 }
-.project:hover .project__media img { transform: scale(1.05); }
+.project:hover .project__media img { transform: scale(1.03); }
+.project[data-slug="consultancy-firm"]  { --focus: 82%; }
+.project[data-slug="real-estate"]       { --focus: 66%; }
+.project[data-slug="sharedeal"]         { --focus: 48%; }
+.project[data-slug="bebshapati"]        { --focus: 41%; }
+.project[data-slug="vida-ev"]           { --focus: 34%; }
+.project[data-slug="travella"]          { --focus: 92%; }
+.project[data-slug="portfolio-website"] { --focus: 60%; }
+
+/* spatial scene hover (mouse only; main.js feeds --sx/--sy = pointer -1..1, --sa = 0..1 hover amount) */
+@media (hover: hover) {
+  .project__frame { perspective: 1100px; }
+  .project__media.has-img img {
+    /* the picture sits "behind" the card face and drifts the other way, so it reads as depth */
+    transition: none;
+    transform: translate(calc(var(--sx, 0) * -2.2%), calc(var(--sy, 0) * -2.2%)) scale(calc(1 + var(--sa, 0) * 0.07));
+  }
+  .project:hover .project__media.has-img img { transform: translate(calc(var(--sx, 0) * -2.2%), calc(var(--sy, 0) * -2.2%)) scale(calc(1 + var(--sa, 0) * 0.07)); }
+  .project__depth { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+  .project__glare {
+    position: absolute; inset: 0; pointer-events: none; z-index: 2;
+    background: radial-gradient(60% 50% at calc(50% + var(--sx, 0) * 50%) calc(50% + var(--sy, 0) * 50%), rgba(255,255,255,.22), transparent 70%);
+    opacity: var(--sa, 0); mix-blend-mode: soft-light;
+  }
+}
 
 /* ---------- left column: title, story, services, links, launch ---------- */
 .pv__meta {
@@ -59,12 +91,12 @@
   position: relative; overflow: hidden; will-change: transform, opacity;
 }
 .pv__cta-dot {
-  width: 8px; height: 8px; border-radius: 50%; background: var(--blue);
+  width: 8px; height: 8px; border-radius: 50%; background: var(--pv-cta-fill, var(--blue));
   transition: transform .5s cubic-bezier(.35, 0, 0, 1), background .3s .1s;
 }
 .pv__cta span:last-child { position: relative; z-index: 1; transition: color .3s .1s; }
-.pv__cta:hover .pv__cta-dot { transform: scale(30); }
-.pv__cta:hover span:last-child { color: #fff; }
+.pv__cta:hover .pv__cta-dot { transform: scale(80); }   /* big enough to reach the far right edge of the button */
+.pv__cta:hover span:last-child { color: var(--pv-cta-fill-ink, #fff); }
 
 /* ---------- horizontal gallery ---------- */
 .pv__wrap { position: absolute; inset: 0; z-index: 1; }
@@ -667,6 +699,7 @@ body.is-project .header .pill--light { background: #fff; }
 .pv-plx.is-user .pv-plx__hint { opacity: 0; }
 
 /* Travella: depth layers */
+.pv-lead { max-width: 30em; margin: 0 0 22px; font-size: clamp(15px, 1.1vw, 20px); font-weight: 500; line-height: 1.5; opacity: .85; }
 .pv-layers { position: relative; display: grid; gap: 10px; perspective: 900px; }
 .pv-layers div { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 20px; border-radius: 14px;
   background: color-mix(in srgb, var(--pv-hl) calc(8% + var(--z) * 8%), transparent); transform: translateX(calc(var(--z) * 14px)); transition: transform .6s var(--ease); }

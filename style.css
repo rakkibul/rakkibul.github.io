@@ -15,7 +15,7 @@
   --header-h: 84px;
   --hero-top: clamp(150px, 12.6vw, 250px);   /* room for the big header tagline */
   --ease: cubic-bezier(.2, .8, .2, 1);
-  --sans: "Geist", "Inter", system-ui, sans-serif;
+  --sans: "General Sans", "Geist", system-ui, sans-serif;   /* close to Lusion's Aeonik, free (Fontshare) */
   --mono: "Geist Mono", ui-monospace, monospace;
 }
 
@@ -56,8 +56,38 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   font-size: clamp(90px, 10.5vw, 190px); font-weight: 400; letter-spacing: -0.05em; line-height: 1;
 }
 .odo { display: inline-block; height: 1em; overflow: hidden; }
-.odo__track { display: flex; flex-direction: column; transition: transform .75s cubic-bezier(.65, 0, .25, 1); }
+.odo__track { display: flex; flex-direction: column; will-change: transform; }   /* rolled by GSAP in main.js */
 .odo__track span { height: 1em; display: block; }
+
+/* ================= Full-screen showreel (opened from the reel) ================= */
+.reelov { position: fixed; inset: 0; z-index: 150; background: #000; display: none; opacity: 0; font-size: clamp(14px, 1vw, 20px); color: #fff; }
+.reelov.is-open { display: block; }
+@media (hover: hover) { .reelov, .reelov * { cursor: none; } }
+.reelov__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+.reelov::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 28vh; pointer-events: none;
+  background: linear-gradient(to top, rgba(0, 0, 0, .55), transparent); }   /* keeps the white controls readable on bright frames */
+.reelov__controls { z-index: 1; }
+.reelov__cursor, .reelov__x { z-index: 2; }
+.reelov__controls { position: absolute; left: var(--pad); right: var(--pad); bottom: 5vh; display: grid; grid-template-columns: 1fr 6fr 1fr; align-items: center; gap: 2em; }
+.reelov__btn { background: none; border: 0; padding: .4em 0; color: #fff; font: inherit; font-weight: 500; letter-spacing: .04em; }
+.reelov__toggle { text-align: right; }
+.reelov__close { text-align: left; }
+.reelov__bar { position: relative; height: 2em; }
+.reelov__bar i { position: absolute; top: 50%; left: 0; height: .375em; border-radius: .1875em; transform: translateY(-50%); }
+.reelov__bg { width: 100%; background: rgba(255, 255, 255, .2); }
+.reelov__fill { width: 0; background: #fff; }
+.reelov__cursor { position: absolute; top: 0; left: 0; width: 6.25em; height: 6.25em; border-radius: 50%; background: #fff; color: #0b0b10;
+  display: flex; align-items: center; justify-content: center; pointer-events: none; transform: scale(0); will-change: transform; }
+.reelov__cursor svg { width: 36%; height: 36%; }
+.reelov__x { position: absolute; top: 22px; right: var(--pad); width: 2.8em; height: 2.8em; border-radius: 50%; border: 0; background: #2b2e3a; color: #fff; display: none; align-items: center; justify-content: center; }
+.reelov__x svg { width: 45%; height: 45%; }
+@media (hover: none), (max-width: 812px) {
+  .reelov__cursor { display: none; }
+  .reelov__x { display: flex; }
+  .reelov__video { object-fit: contain; }
+  .reelov__controls { grid-template-columns: auto 1fr auto; gap: 1em; }
+}
+.reel__panel { cursor: pointer; }
 
 /* ================= Page overlays ================= */
 #trail {
@@ -97,6 +127,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .logo__mark { transition: transform .6s var(--ease), background .35s, box-shadow .35s; }
 .header.on-dark .logo { color: #fff; }
 .header.on-dark .logo__mark { background: #fff; box-shadow: inset 0 0 0 .16em var(--dark); }
+/* the mark is the same "P" shape as the favicon; it keeps whatever colour the logo has on each background */
+.logo__mark {
+  border-radius: 0; box-shadow: none !important;
+  clip-path: polygon(11% 5.3%, 89% 5.3%, 89% 60%, 41% 60%, 41% 94.7%, 11% 94.7%);
+}
 /* big statement tagline, like a headline sitting in the header */
 .header__tagline {
   margin-top: -2px;
@@ -235,9 +270,11 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   pointer-events: none; z-index: 0; overflow: visible;
 }
 .tube path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.tube__shadow { stroke: #000c8a; stroke-width: 38; transform: translate(3px, 5px); opacity: .9; }
-.tube__base { stroke: url(#tubeGrad); stroke-width: 34; }
-.tube__hl { stroke: rgba(255, 255, 255, .45); stroke-width: 7; transform: translate(-6px, -7px); }
+/* one clean gradient line: the old shadow and solid base stay only as invisible guides for the length */
+.tube__shadow, .tube__base { stroke: none; }
+.tube__segs path { stroke-width: 34; stroke-linecap: round; }
+.tube__mask { stroke: #fff; stroke-width: 44; }
+.tube__hl { display: none; }   /* no white highlight line on the tube */
 
 .intro__title {
   position: relative; z-index: 1;
@@ -328,7 +365,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   display: flex; justify-content: space-between; align-items: flex-end; gap: 32px;
   margin-bottom: clamp(40px, 5vw, 64px);
 }
-.section-title { font-size: clamp(44px, 7.4vw, 120px); font-weight: 400; line-height: 1; letter-spacing: -0.05em; }
+.section-title { font-size: clamp(44px, 7.4vw, 120px); font-weight: 500; line-height: 1; letter-spacing: -0.05em; }
 .work__desc {
   max-width: 300px; font-family: var(--mono); font-size: 11.5px; line-height: 1.45;
   text-transform: uppercase; letter-spacing: .03em;
@@ -505,6 +542,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 @media (max-width: 640px) {
   .work__grid { grid-template-columns: 1fr; }               /* two project columns until phones */
+  .footer__word { font-size: clamp(48px, 17.2vw, 340px); } /* General Sans is a little wider: keep the last Y inside on phones */
 }
 @media (max-width: 480px) {
   .reel__title { font-size: clamp(30px, 10.5vw, 48px); gap: 10px; }   /* PLAY ▶ REEL fits narrow phones */
@@ -515,4 +553,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ================= Page transition (pixel blocks) ================= */
+html.pt-in::after { content: ""; position: fixed; inset: 0; z-index: 400;   /* covered (black + the small white P) until main.js takes over */
+  background: #0b0b10 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M11 5.3H89V60H41V94.7H11Z' fill='%23fff'/%3E%3C/svg%3E") center / calc(min(14px, 100vw / 90) * 3.3333) no-repeat; }
+.pt { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 399; pointer-events: none; display: none; }
+
+/* ================= Projects page (projects.html) ================= */
+.page-projects .work--all { padding-top: calc(var(--pad) + 18vh); }
+.pall__head { margin-bottom: clamp(40px, 6vw, 90px); }
+.pall__title { position: relative; display: inline-block; margin: 0; font-size: 16vw; font-weight: 500; line-height: .9; letter-spacing: -0.04em; }
+.pall__word { display: inline-flex; }
+.pall__c { display: inline-block; overflow: hidden; padding-bottom: .04em; }
+.pall__c > span { display: inline-block; will-change: transform; }
+/* the count and the arrow sit together in one small column right of the word: 07 on top, arrow under it */
+.pall__side { position: absolute; top: .3em; left: calc(100% + .3em); display: flex; flex-direction: column; align-items: flex-start; gap: .35em; font-size: .23em; line-height: 1; }
+.pall__count { display: inline-flex; font-family: var(--mono); font-weight: 400; letter-spacing: 0; line-height: 1; }
+.pall__arrow { display: block; width: .8em; height: .8em; }
+.pall__arrow svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (max-width: 760px) {
+  .page-projects .work--all { padding-top: 120px; }
+  .pall__title { font-size: 14vw; }
 }

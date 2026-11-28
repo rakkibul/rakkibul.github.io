@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects — Prottoy</title>
+  <meta name="description" content="MD Rakkibul Islam Prottoy is a product designer with 2+ years of experience in UI/UX design, brand and technology." />
+
+  <!-- site icon -->
+  <link rel="icon" href="assets/favicon.svg?v=6" type="image/svg+xml" />
+  <link rel="icon" href="assets/favicon-32.png?v=6" sizes="32x32" type="image/png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" href="assets/favicon-32-dark.png?v=6" sizes="32x32" type="image/png" media="(prefers-color-scheme: dark)" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5" />
+  <meta name="theme-color" content="#0016ec" />
+
+  <!-- what LinkedIn, WhatsApp, Facebook and X show when the link is shared -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Prottoy — Product Designer" />
+  <meta property="og:title" content="Prottoy — Product Designer" />
+  <meta property="og:description" content="Portfolio of MD Rakkibul Islam Prottoy: product design, UI/UX, brand and technology. Case studies with the full design process." />
+  <meta property="og:url" content="https://rakkibul.github.io/projects.html" />
+  <meta property="og:image" content="https://rakkibul.github.io/assets/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Prottoy, Product Designer, with three project covers" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Prottoy — Product Designer" />
+  <meta name="twitter:description" content="Portfolio of MD Rakkibul Islam Prottoy: product design, UI/UX, brand and technology." />
+  <meta name="twitter:image" content="https://rakkibul.github.io/assets/og.jpg" />
+  <link rel="canonical" href="https://rakkibul.github.io/projects.html" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=3.32" />
+  <link rel="stylesheet" href="project.css?v=42" />
+
+  <!-- every load / refresh starts at the hero: no remembered scroll position, no #section jump -->
+  <script>
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+    window.scrollTo(0, 0);
+    // arriving from the page transition: start covered, main.js clears the pixels
+    try { if (sessionStorage.getItem("pt")) { sessionStorage.removeItem("pt"); document.documentElement.classList.add("pt-in"); } } catch (e) {}
+    // reached with the browser's Back/Forward buttons: open with the same P transition
+    // (Reload too, except on home, which plays its own loader on reload)
+    try {
+      const nav = (performance.getEntriesByType("navigation")[0] || {}).type, home = /\/(index\.html)?$/.test(location.pathname);
+      if (nav === "back_forward" || (nav === "reload" && !home)) document.documentElement.classList.add("pt-in");
+    } catch (e) {}
+  </script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body class="page-projects">
+
+  <!-- Blue duotone filter used by the intro card -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <filter id="duo" color-interpolation-filters="sRGB">
+      <feColorMatrix type="matrix" values=".299 .587 .114 0 0  .299 .587 .114 0 0  .299 .587 .114 0 0  0 0 0 1 0" />
+      <feComponentTransfer>
+        <feFuncR type="table" tableValues="0 0.84" />
+        <feFuncG type="table" tableValues="0.086 0.86" />
+        <feFuncB type="table" tableValues="0.925 1" />
+      </feComponentTransfer>
+    </filter>
+  </svg>
+
+
+  <canvas id="trail" aria-hidden="true"></canvas>
+
+  <!-- ================= Header ================= -->
+  <header class="header" id="header">
+    <a href="index.html" class="logo" data-pt aria-label="Prottoy home">
+      <span class="logo__mark"></span>PROTTOY
+    </a>
+    <p class="header__tagline">
+      <span class="line"><span>Product designer with 2+ years</span></span>
+      <span class="line"><span>of experience in UI/UX design,</span></span>
+      <span class="line"><span>brand and technology.</span></span>
+    </p>
+    <div class="header__actions">
+      <button class="icon-btn" id="soundBtn" aria-label="Play ambient music" aria-pressed="false" title="Sound on / off">
+        <svg viewBox="0 0 24 18" aria-hidden="true"><path id="soundWave" d="M3 9 L21 9" /></svg>
+      </button>
+      <a href="#contact" class="pill pill--dark pill--talk">
+        <span class="pill__arrow">→</span>
+        <span class="pill__roll"><span>LET'S TALK</span><span>LET'S TALK</span></span>
+        <span class="pill__dot"></span>
+      </a>
+      <button class="pill pill--light" id="menuBtn" aria-expanded="false" aria-controls="menu">
+        <span class="pill__roll"><span>MENU</span><span>CLOSE</span></span>
+        <span class="pill__dots"><i></i><i></i></span>
+      </button>
+    </div>
+
+    <nav class="menu" id="menu" aria-label="Main">
+      <a href="index.html" data-pt><span>Home</span><b>→</b></a>
+      <a href="index.html?to=about" data-pt><span>About</span><b>→</b></a>
+      <a href="projects.html" data-pt><span>Projects</span><b>→</b></a>
+      <a href="#contact"><span>Contact</span><b>→</b></a>
+      <div class="menu__foot">
+        <p>Open to product design roles · 2026</p>
+      </div>
+    </nav>
+  </header>
+
+  <main id="top">
+
+    <!-- ================= All projects ================= -->
+    <section class="work work--all" id="work">
+      <div class="pall__head">
+        <h1 class="pall__title" aria-label="Projects, 07">
+          <span class="pall__word">PROJECTS</span>
+          <span class="pall__side">
+            <span class="pall__count">07</span>
+            <span class="pall__arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 5 19 19M19 7v12H7" /></svg></span>
+          </span>
+        </h1>
+      </div>
+
+      <div class="work__grid">
+        <a href="#" class="project" data-slug="consultancy-firm">
+          <div class="project__media has-img" style="--c1:#13161a;--c2:#2a8f57">
+            <img src="assets/work/consultancy-firm/cover.jpg" alt="Consultancy Firm cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">PRODUCT DESIGN • PROFESSIONAL SERVICE • 2025</p>
+          <h3 class="project__title"><b>→</b>Consultancy Firm</h3>
+        </a>
+        <a href="#" class="project" data-slug="real-estate">
+          <div class="project__media has-img" style="--c1:#0d1a2a;--c2:#a4e34a">
+            <img src="assets/work/real-estate/cover.jpg" alt="Real Estate Landing cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI DESIGN • E-COMMERCE • 2025</p>
+          <h3 class="project__title"><b>→</b>Real Estate Landing</h3>
+        </a>
+        <a href="#" class="project" data-slug="sharedeal">
+          <div class="project__media has-img" style="--c1:#4bab25;--c2:#b5e39a">
+            <img src="assets/work/sharedeal/cover.jpg" alt="ShareDeal cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">PRODUCT DESIGN • SOCIAL E-COMMERCE • 2025</p>
+          <h3 class="project__title"><b>→</b>ShareDeal</h3>
+        </a>
+        <a href="#" class="project" data-slug="bebshapati">
+          <div class="project__media has-img" style="--c1:#16181c;--c2:#2563eb">
+            <img src="assets/work/bebshapati/cover.jpg" alt="Bebshapati cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI UX DESIGN • FINANCE • 2025</p>
+          <h3 class="project__title"><b>→</b>Bebshapati</h3>
+        </a>
+        <a href="#" class="project" data-slug="vida-ev">
+          <div class="project__media has-img" style="--c1:#121212;--c2:#ff6a1a">
+            <img src="assets/work/vida-ev/cover.jpg" alt="Vida EV cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">CASE STUDY • E-COMMERCE • 2025</p>
+          <h3 class="project__title"><b>→</b>Vida EV</h3>
+        </a>
+        <a href="#" class="project" data-slug="travella">
+          <div class="project__media has-img" style="--c1:#2a1e3a;--c2:#7d5fb0">
+            <img src="assets/work/travella/cover.jpg" alt="Travella cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI DESIGN • LIFESTYLE • 2024</p>
+          <h3 class="project__title"><b>→</b>Travella</h3>
+        </a>
+        <a href="#" class="project" data-slug="portfolio-website">
+          <div class="project__media has-img" style="--c1:#f26a1b;--c2:#ffd0b0">
+            <img src="assets/work/portfolio-website/cover.jpg" alt="Portfolio Website cover" loading="lazy" decoding="async" />
+          </div>
+          <p class="project__tags">UI UX • PORTFOLIO • 2025</p>
+          <h3 class="project__title"><b>→</b>Portfolio Website</h3>
+        </a>
+      </div>
+    </section>
+
+    <!-- ================= Footer / Contact ================= -->
+    <footer class="footer" id="contact">
+      <div class="footer__panel">
+        <div class="footer__top">
+          <h2 class="footer__title">
+            <span class="line"><span>Got a product idea?</span></span>
+            <span class="line"><span>Let's make it real.</span></span>
+          </h2>
+          <a href="mailto:md.rakkibul38@gmail.com" class="pill pill--white pill--big magnetic">
+            <span class="pill__dot pill__dot--dark"></span>
+            <span class="pill__roll"><span>MD.RAKKIBUL38@GMAIL.COM</span><span>MD.RAKKIBUL38@GMAIL.COM</span></span>
+          </a>
+        </div>
+
+        <div class="footer__cols">
+          <div>
+            <p class="footer__label">Based in</p>
+            <p>Rajshahi, Bangladesh<br />Working worldwide</p>
+          </div>
+          <div>
+            <p class="footer__label">Social</p>
+            <a href="https://dribbble.com/rakkibul_islam" target="_blank" rel="noopener">Dribbble</a><a href="https://www.behance.net/mdrakkibul" target="_blank" rel="noopener">Behance</a><a href="https://www.linkedin.com/in/rakkibul-islam/" target="_blank" rel="noopener">LinkedIn</a><a href="https://94e84440-e373-4f25-97c3-3a86a65d8074.filesusr.com/ugd/d1d085_073a4bd10bd446a39430c7b0e70501ca.pdf" target="_blank" rel="noopener">Resume</a>
+          </div>
+          <div>
+            <p class="footer__label">Menu</p>
+            <a href="index.html" data-pt>Home</a><a href="index.html?to=about" data-pt>About</a><a href="projects.html" data-pt>Projects</a>
+          </div>
+          <form class="newsletter" onsubmit="event.preventDefault(); const em = this.querySelector('input').value.trim(); location.href = 'mailto:md.rakkibul38@gmail.com?subject=' + encodeURIComponent('Subscribe to your design notes') + '&body=' + encodeURIComponent('Hi Prottoy, please add ' + em + ' to your design notes.'); this.classList.add('is-done');">
+            <p class="footer__label">Subscribe to my design notes</p>
+            <div class="newsletter__field">
+              <input type="email" placeholder="Your email" aria-label="Your email" required />
+              <button type="submit" aria-label="Subscribe">→</button>
+            </div>
+            <p class="newsletter__ok">Your email app is opening. Just hit Send to subscribe.</p>
+          </form>
+        </div>
+
+        <div class="footer__word" aria-hidden="true">PROTTOY</div>
+
+        <div class="footer__bottom">
+          <p>© <span id="year"></span> MD Rakkibul Islam Prottoy. All rights reserved.</p>
+          <a href="#top">Back to top ↑</a>
+        </div>
+      </div>
+    </footer>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script type="module" src="main.js?v=3.41"></script>
+  <script src="stories.js?v=11"></script>
+  <script src="stories-more.js?v=11"></script>
+  <script src="project.js?v=32"></script>
+</body>
+</html>

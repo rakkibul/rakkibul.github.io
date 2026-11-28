@@ -334,9 +334,8 @@
       { type: "text", ar: 1006 / 1400, init: compareInit, html: compare(VE + "10.jpg", VE + "11.jpg", "Wireframe", "Final"),
         cap: { n: "04", t: "From wireframe to final" } },
       { type: "image", src: VE + "12.jpg", ar: 1481 / 1399, cap: { n: "05", t: "Type and colour" } },
-      { type: "image", src: VE + "13.jpg", ar: 3943 / 1099, cap: { n: "06", t: "The finished app" } },
       { type: "text", span: 0.32, init: counters, html: `
-        ${head("07 — In numbers", "A complete UX process.")}
+        ${head("06 — In numbers", "A complete UX process.")}
         <div class="pv-done">
           <div><b data-count="4">0</b>Weeks</div><div><b data-count="5">0</b>Design stages</div>
           <div><b data-count="3">0</b>Competitors studied</div><div><b data-count="1">0</b>Persona</div>
@@ -378,24 +377,34 @@
       links: [["Case on Wix", "https://rakkibul.wixstudio.com/rakkibul/work/travella"], ["Behance", "https://www.behance.net/mdrakkibul"], ["Dribbble", "https://dribbble.com/rakkibul_islam"]],
       url: "https://rakkibul.wixstudio.com/rakkibul/work/travella",
     },
+    // the story reads like the trip itself: see it move, why it exists, the idea, the walk through it,
+    // how the depth works, the screens, and what was delivered
     media: [
-      { type: "text", ar: 16 / 9, init: parallaxInit, html: parallaxHTML, cap: { n: "00", t: "The parallax, live — move your mouse" } },
+      { type: "video", src: TR + "film.mp4", poster: TR + "poster.jpg", ar: 16 / 9,
+        cap: { n: "00", t: "The whole site in 17 seconds", d: "Press “Start here” and the page walks you into the forest." } },
       { type: "text", span: 0.4, html: `
-        ${head("01 — Brief", "Booking a trip should feel like the trip.", "pv-big")}
-        ${facts([["Year", "2024"], ["Role", "UI Designer"], ["Field", "Lifestyle"]])}
-        ${chips(["Destinations", "Flights", "Stays", "Itinerary", "Reviews"], "pv-chips--line")}` },
+        ${head("01 — The problem", "Booking a trip feels like paperwork.", "pv-big")}
+        <div class="pv-probs">
+          <div><i>🧾</i><b>Forms, tables, filters</b><span>Most booking sites look like a spreadsheet of tickets.</span></div>
+          <div><i>😶</i><b>The excitement is gone</b><span>The trip should start the moment you start planning it.</span></div>
+        </div>
+        ${facts([["Year", "2024"], ["Role", "UI Designer"], ["Field", "Lifestyle"]])}` },
       { type: "text", span: 0.36, html: `
-        ${head("02 — The idea", "Depth that pulls you in.")}
+        ${head("02 — The idea", "Make booking the first step of the journey.")}
+        <p class="pv-lead">Every scroll takes you one step deeper into the place you are about to visit. The search and the ticket are still one click away, but the page makes you want to go.</p>
+        ${chips(["Search trips", "Book tickets", "Feel the place"], "pv-chips--line")}` },
+      { type: "text", ar: 16 / 9, init: parallaxInit, html: parallaxHTML, cap: { n: "03", t: "How the depth works — move your mouse", d: "Each layer moves at its own speed: sky slowest, headline fastest." } },
+      { type: "text", span: 0.32, html: `
+        ${head("04 — Layers", "Depth that pulls you in.")}
         <div class="pv-layers">
           <div style="--z:0"><b>Sky</b><span>moves slowest</span></div>
           <div style="--z:1"><b>Mountains</b><span>drift behind</span></div>
           <div style="--z:2"><b>Forest</b><span>passes by</span></div>
           <div style="--z:3"><b>Headline</b><span>moves fastest</span></div>
         </div>` },
-      { type: "image", src: TR + "01.jpg", ar: 1680 / 1400, cap: { n: "03", t: "On desktop" } },
-      { type: "image", src: TR + "02.jpg", ar: 1944 / 1400, cap: { n: "04", t: "Immersive parallax" } },
+      { type: "image", src: TR + "01.jpg", ar: 1680 / 1400, cap: { n: "05", t: "On desktop" } },
       { type: "text", span: 0.3, html: `
-        ${head("05 — Delivered", "A travel site with a sense of place.")}
+        ${head("06 — Delivered", "A booking site with a sense of place.")}
         ${chips(["Landing page", "Parallax motion", "Booking entry", "Get Your Ticket CTA"])}` },
     ],
   };

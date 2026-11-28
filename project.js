@@ -14,6 +14,9 @@
   if (!cards.length) return;
   const $ = (s, r = document) => r.querySelector(s);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // closing a project goes back in history; stop the browser from yanking the page back to where it
+  // was when the project opened, so the zoom-out can land on the card you are actually on
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
 
   /* ---------- content: projects from Prottoy's portfolio (order matches the cards) ---------- */
   const DATA = [
@@ -335,10 +338,6 @@
      {
       "src": "assets/work/vida-ev/12.jpg",
       "ar": 1.0586
-     },
-     {
-      "src": "assets/work/vida-ev/13.jpg",
-      "ar": 3.5845
      }
     ]
    },
@@ -435,16 +434,24 @@
     ]
    }
   ];
-  const P = cards.map((card, i) => {
-    const d = DATA[i % DATA.length];
-    const media = card.querySelector(".project__media");
-    const title = card.querySelector(".project__title").textContent.replace("→", "").trim();
+  // name + card colours of every project, so all 7 work even when a page shows only some of the cards
+  // (home shows 4, projects.html shows all). Projects are matched to cards by slug, not by position.
+  const CARDS = {
+    "consultancy-firm": ["Consultancy Firm", "#13161a", "#2a8f57"],
+    "real-estate": ["Real Estate Landing", "#0d1a2a", "#a4e34a"],
+    "sharedeal": ["ShareDeal", "#4bab25", "#b5e39a"],
+    "bebshapati": ["Bebshapati", "#16181c", "#2563eb"],
+    "vida-ev": ["Vida EV", "#121212", "#ff6a1a"],
+    "travella": ["Travella", "#2a1e3a", "#7d5fb0"],
+    "portfolio-website": ["Portfolio Website", "#f26a1b", "#ffd0b0"],
+  };
+  const P = DATA.map((d, i) => {
+    const card = cards.find((c) => c.dataset.slug === d.slug) || null;
+    const [title, c1, c2] = CARDS[d.slug] || [d.slug, "#0016ec", "#9fb4ff"];
     const story = (window.PV_STORIES || {})[d.slug];          // a written case study, when there is one
-    return { ...d, ...(story ? story.meta : {}), media: story ? story.media : d.media, i, card, title,
-      c1: media.style.getPropertyValue("--c1").trim() || "#0016ec",
-      c2: media.style.getPropertyValue("--c2").trim() || "#9fb4ff",
-    };
+    return { ...d, ...(story ? story.meta : {}), media: story ? story.media : d.media, i, card, title, c1, c2 };
   });
+  const cardMedia = (i) => P[i]?.card?.querySelector(".project__media") || null;
 
   /* ---------- helpers ---------- */
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
@@ -500,6 +507,7 @@
   back.innerHTML = '<svg viewBox="0 0 16 16"><path d="M13.5 8h-11m0 0 4.8-4.8M2.5 8l4.8 4.8"/></svg><span>BACK</span>';
   $("#header").appendChild(back);
   const work = $("#work");
+  const HOME_TITLE = document.title;
   // BACK sits just left of the header buttons, so it never lands on top of them at any screen width
   const placeBack = () => {
     const actions = $(".header__actions"), header = $("#header");
@@ -528,9 +536,12 @@
     const light = lum(p.bg) > 0.5;                       // on a light page the launch button turns dark so it still stands out
     document.body.classList.toggle("pv-dark", lum(p.bg) < 0.4);
     pv.style.setProperty("--pv-cta-bg", light ? p.text : "#fff"); pv.style.setProperty("--pv-cta-ink", light ? "#fff" : "#192743");
+    // the launch button's hover fill takes this project's own highlight colour; its text turns dark on a pale fill
+    pv.style.setProperty("--pv-cta-fill", p.hl); pv.style.setProperty("--pv-cta-fill-ink", lum(p.hl) > 0.6 ? "#111" : "#fff");
     document.documentElement.style.setProperty("--pv-hl-now", p.hl);
     document.documentElement.style.setProperty("--pv-bg-now", p.bg);
     el.title.textContent = p.title;
+    document.title = `${p.title} — Prottoy`;            // the browser tab names the open project
     el.desc.innerHTML = p.story.map((s) => `<p>${s}</p>`).join("");
     $("ul", el.services).innerHTML = p.services.map((s) => `<li>${s}</li>`).join("");
     $("ul", el.links).innerHTML = p.links.map(([t, u]) => `<li><a href="${u}" target="_blank" rel="noopener">${t}</a></li>`).join("");
@@ -802,12 +813,53 @@
     startLoop();
     if (instant || reduce || !gsap) { S.bg = 1; S.show = 1; S.content = 1; return; }
     S.bg = 0; S.show = 0; S.content = 0;
-    const r = work.getBoundingClientRect();
-    gsap.set(work, { transformOrigin: `50% ${innerHeight / 2 - r.top}px` });
+    // the grid zooms into the clicked card until its picture fills the screen, the picture blurs
+    // into the project's colour, then the project page builds up on that colour
+    const media = cardMedia(i);
+    if (!media) {                                    // no card for it on this page: a simple fade into the project
+      tl = gsap.timeline();
+      tl.to(S, { bg: 1, duration: 0.75, ease: "power2.inOut" }, 0).to(S, { show: 1, content: 1, duration: 1.6, ease: "none" }, 0.4);
+      return;
+    }
+    const z = zoomTo(media);
+    gsap.set(work, { transformOrigin: `${z.ox}px ${z.oy}px`, opacity: 1, "--zf": 1 });
+    work.classList.add("is-zoom");
     tl = gsap.timeline();
-    tl.to(work, { scale: 1.06, opacity: 0, duration: 0.75, ease: "power2.in" }, 0)
-      .to(S, { bg: 1, duration: 0.75, ease: "power2.inOut" }, 0)
-      .to(S, { show: 1, content: 1, duration: 1.6, ease: "none" }, 0.4);
+    // timing/maths follow Lusion: titles fade first (¼ of 1.5s), then a cubic-in-out zoom to 1.2× cover
+    // with a small 3D tilt (rotateY/Z = 0.3 × the card's offset from the centre ÷ screen width)
+    tl.to(work, { "--zf": 0, duration: 0.375, ease: "power1.out" }, 0)
+      .to(work, { x: z.x, y: z.y, scale: z.s, rotationY: z.ry, rotationZ: -z.ry, transformPerspective: 1800, duration: 1.125, ease: "power2.inOut" }, 0.375);
+    const D = window.PV_DEPTH;
+    D?.load(media);
+    if (D?.ready(media)) {
+      // with the card's depth map: fly into the picture and melt it into the project colour, far parts first
+      const fx = { u: 0 }, hex = P[i].bg;
+      tl.to(fx, { u: 1, duration: 1.125, ease: "power2.inOut", onUpdate: () => D.act(media, fx.u * fx.u, hex) }, 0.375)
+        .to(S, { bg: 1, duration: 0.25, ease: "none" }, 1.3);
+    } else {
+      tl.to(media, { filter: "blur(16px)", duration: 0.5, ease: "power1.in", overwrite: "auto" }, 0.9)   // "auto": only the hover blur is stopped, not the card's entrance swing
+        .to(S, { bg: 1, duration: 0.5, ease: "power2.inOut" }, 1.0);
+    }
+    tl.to(S, { show: 1, content: 1, duration: 1.6, ease: "none" }, 1.3);
+  }
+
+  // where #work has to move/scale so this card's picture covers the whole screen
+  function zoomTo(media) {
+    gsap.set(work, { clearProps: "transform" });
+    const wr = work.getBoundingClientRect(), mr = media.getBoundingClientRect();
+    const cx = mr.left + mr.width / 2, cy = mr.top + mr.height / 2;
+    return {
+      ox: cx - wr.left, oy: cy - wr.top, x: innerWidth / 2 - cx, y: innerHeight / 2 - cy,
+      s: Math.max(innerWidth / mr.width, innerHeight / mr.height) * 1.2,
+      ry: (0.3 * (innerWidth / 2 - cx) / innerWidth) * 57.2958,   // degrees
+      seen: mr.bottom > 0 && mr.top < innerHeight,
+    };
+  }
+  // put the grid back exactly as it was
+  function unzoom() {
+    work.classList.remove("is-zoom");
+    gsap.set(work, { clearProps: "transform,opacity,--zf" });
+    cards.forEach((c) => gsap.set(c.querySelector(".project__media"), { clearProps: "filter" }));
   }
 
   function close({ instant = false, fromPop = false } = {}) {
@@ -818,15 +870,48 @@
     pushed = false;
     const done = () => {
       S.open = false; S.bg = 0; S.show = 0; S.content = 0; S.hide = 0;
+      document.title = HOME_TITLE;
       document.body.classList.remove("is-project");
       pv.classList.remove("is-open"); pv.setAttribute("aria-hidden", "true");
       items.forEach((it) => { it.tw?.pause(0); it.on = false; it.a = 0; it.video?.pause(); it._play = false; it.box.classList.remove("is-on"); });
     };
-    if (instant || reduce || !gsap) { gsap?.set(work, { clearProps: "transform,opacity" }); done(); return; }
-    tl = gsap.timeline({ onComplete: done });
-    tl.to(S, { hide: 1, duration: 0.6, ease: "none" }, 0)
-      .to(S, { bg: 0, duration: 0.6, ease: "power2.inOut" }, 0.35)
-      .fromTo(work, { scale: 1.06, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: "power3.out", clearProps: "transform,opacity" }, 0.4);
+    if (instant || reduce || !gsap) { if (gsap) unzoom(); done(); return; }
+    // reverse of opening: the page clears, the colour turns back into the (blurred) picture of the
+    // project you are on, which sharpens and zooms back out into its card in the grid
+    const media = cardMedia(S.cur);
+    let z = media ? zoomTo(media) : { seen: false };
+    if (media && !z.seen) {                          // like Lusion: first jump the page so that card sits ¼ down the screen
+      const target = scrollY + media.getBoundingClientRect().top - innerHeight * 0.25;
+      window.__lenis ? window.__lenis.scrollTo(target, { immediate: true, force: true }) : scrollTo(0, target);
+      z = zoomTo(media);
+    }
+    if (!z.seen) {                                   // still not on screen: just bring the grid back
+      unzoom();
+      tl = gsap.timeline({ onComplete: done });
+      tl.to(S, { hide: 1, duration: 0.6, ease: "none" }, 0)
+        .to(S, { bg: 0, duration: 0.6, ease: "power2.inOut" }, 0.35)
+        .fromTo(work, { scale: 1.06, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: "power3.out", clearProps: "transform,opacity" }, 0.4);
+      return;
+    }
+    cards.forEach((c) => gsap.set(c.querySelector(".project__media"), { clearProps: "filter" }));
+    work.classList.add("is-zoom");
+    gsap.set(work, { transformOrigin: `${z.ox}px ${z.oy}px`, x: z.x, y: z.y, scale: z.s, rotationY: z.ry, rotationZ: -z.ry, transformPerspective: 1800, opacity: 1, "--zf": 0 });
+    const D = window.PV_DEPTH;
+    D?.load(media);
+    const deep = !!D?.ready(media), fx = { u: 1 }, hex = P[S.cur].bg;
+    if (deep) D.act(media, 1, hex); else gsap.set(media, { filter: "blur(16px)" });
+    tl = gsap.timeline({ onComplete: () => { D?.act(media, 0); unzoom(); done(); } });
+    tl.to(S, { hide: 1, duration: 0.6, ease: "none" }, 0);
+    if (deep) {
+      // the colour turns back into the picture, near parts first, while the camera flies back out
+      tl.to(S, { bg: 0, duration: 0.2, ease: "none" }, 0.5)
+        .to(fx, { u: 0, duration: 1.125, ease: "power2.inOut", onUpdate: () => D.act(media, fx.u * fx.u, hex) }, 0.6);
+    } else {
+      tl.to(S, { bg: 0, duration: 0.5, ease: "power2.inOut" }, 0.4)
+        .to(media, { filter: "blur(0px)", duration: 0.5, ease: "power1.out" }, 0.45);
+    }
+    tl.to(work, { x: 0, y: 0, scale: 1, rotationY: 0, rotationZ: 0, duration: 1.125, ease: "power2.inOut" }, 0.6)
+      .to(work, { "--zf": 1, duration: 0.4, ease: "power1.in" }, 1.3);
   }
 
   function goNext() {
@@ -866,9 +951,11 @@
      ========================================================= */
   const nudge = (d) => {
     if (S.content <= 0.75 || S.next > 0 || S.prev > 0 || S.goingNext) return;
-    if (d > 0 && S.target >= S.max - 1) {           // at the end, a little more scrolling fills the bar: about three wheel ticks
+    if (d > 0 && S.target >= S.max - 1) {           // at the end, more scrolling fills the bar: about seven wheel ticks
       S.fwdHold = 0.14;
-      S.over = clamp(S.over + Math.min(Math.abs(d), 150) / 250);
+      // only once the page has actually come to rest at the end, so the scroll that brought you here
+      // (and a trackpad's leftover momentum) does not already fill it
+      if (S.scroll >= S.max - 2) S.over = clamp(S.over + Math.min(Math.abs(d), 120) / 700);
       if (S.over >= 1) { goNext(); return; }
     }
     if (d < 0) S.backHold = 0.14;
@@ -914,7 +1001,7 @@
   });
 
   /* ---------- wiring ---------- */
-  cards.forEach((card, i) => card.addEventListener("click", (e) => { e.preventDefault(); open(i); }));
+  cards.forEach((card) => card.addEventListener("click", (e) => { e.preventDefault(); open(P.findIndex((p) => p.slug === card.dataset.slug)); }));
   el.prevBtn.addEventListener("click", (e) => { e.preventDefault(); goPrev(); });
   el.prevBtn.addEventListener("pointerenter", () => pv.classList.add("hover-prev"));
   el.prevBtn.addEventListener("pointerleave", () => pv.classList.remove("hover-prev"));

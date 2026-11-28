@@ -6,17 +6,50 @@
   <title>Prottoy — Product Designer</title>
   <meta name="description" content="MD Rakkibul Islam Prottoy is a product designer with 2+ years of experience in UI/UX design, brand and technology." />
 
+  <!-- site icon -->
+  <link rel="icon" href="assets/favicon.svg?v=6" type="image/svg+xml" />
+  <link rel="icon" href="assets/favicon-32.png?v=6" sizes="32x32" type="image/png" media="(prefers-color-scheme: light)" />
+  <link rel="icon" href="assets/favicon-32-dark.png?v=6" sizes="32x32" type="image/png" media="(prefers-color-scheme: dark)" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png?v=5" />
+  <meta name="theme-color" content="#0016ec" />
+
+  <!-- what LinkedIn, WhatsApp, Facebook and X show when the link is shared -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Prottoy — Product Designer" />
+  <meta property="og:title" content="Prottoy — Product Designer" />
+  <meta property="og:description" content="Portfolio of MD Rakkibul Islam Prottoy: product design, UI/UX, brand and technology. Case studies with the full design process." />
+  <meta property="og:url" content="https://rakkibul.github.io/" />
+  <meta property="og:image" content="https://rakkibul.github.io/assets/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="Prottoy, Product Designer, with three project covers" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Prottoy — Product Designer" />
+  <meta name="twitter:description" content="Portfolio of MD Rakkibul Islam Prottoy: product design, UI/UX, brand and technology." />
+  <meta name="twitter:image" content="https://rakkibul.github.io/assets/og.jpg" />
+  <link rel="canonical" href="https://rakkibul.github.io/" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=3.10" />
-  <link rel="stylesheet" href="project.css?v=28" />
+  <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+  <link href="https://api.fontshare.com/v2/css?f[]=general-sans@300,400,500,600,700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css?v=3.32" />
+  <link rel="stylesheet" href="project.css?v=42" />
 
   <!-- every load / refresh starts at the hero: no remembered scroll position, no #section jump -->
   <script>
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     if (location.hash) history.replaceState(null, "", location.pathname + location.search);
     window.scrollTo(0, 0);
+    // arriving from the page transition: start covered, main.js clears the pixels
+    try { if (sessionStorage.getItem("pt")) { sessionStorage.removeItem("pt"); document.documentElement.classList.add("pt-in"); } } catch (e) {}
+    // reached with the browser's Back/Forward buttons: open with the same P transition
+    // (Reload too, except on home, which plays its own loader on reload)
+    try {
+      const nav = (performance.getEntriesByType("navigation")[0] || {}).type, home = /\/(index\.html)?$/.test(location.pathname);
+      if (nav === "back_forward" || (nav === "reload" && !home)) document.documentElement.classList.add("pt-in");
+    } catch (e) {}
   </script>
 
   <script type="importmap">
@@ -83,7 +116,7 @@
     <nav class="menu" id="menu" aria-label="Main">
       <a href="#top"><span>Home</span><b>→</b></a>
       <a href="#about"><span>About</span><b>→</b></a>
-      <a href="#work"><span>Projects</span><b>→</b></a>
+      <a href="projects.html" data-pt><span>Projects</span><b>→</b></a>
       <a href="#contact"><span>Contact</span><b>→</b></a>
       <div class="menu__foot">
         <p>Open to product design roles · 2026</p>
@@ -111,12 +144,15 @@
         <defs>
           <linearGradient id="tubeGrad" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0" stop-color="#0016ec" />
-            <stop offset=".6" stop-color="#0016ec" />
-            <stop offset="1" stop-color="#2b3fff" />
+            <stop offset=".45" stop-color="#2f4bff" />
+            <stop offset="1" stop-color="#7b96ff" />
           </linearGradient>
+          <!-- the scroll-drawn line reveals the coloured segments below -->
+          <mask id="tubeMask" maskUnits="userSpaceOnUse"><path class="tube__mask" /></mask>
         </defs>
         <path class="tube__shadow" />
         <path class="tube__base" />
+        <g class="tube__segs" mask="url(#tubeMask)"></g>
         <path class="tube__hl" />
       </svg>
 
@@ -199,31 +235,10 @@
           <p class="project__tags">UI UX DESIGN • FINANCE • 2025</p>
           <h3 class="project__title"><b>→</b>Bebshapati</h3>
         </a>
-        <a href="#" class="project" data-slug="vida-ev">
-          <div class="project__media has-img" style="--c1:#121212;--c2:#ff6a1a">
-            <img src="assets/work/vida-ev/cover.jpg" alt="Vida EV cover" loading="lazy" decoding="async" />
-          </div>
-          <p class="project__tags">CASE STUDY • E-COMMERCE • 2025</p>
-          <h3 class="project__title"><b>→</b>Vida EV</h3>
-        </a>
-        <a href="#" class="project" data-slug="travella">
-          <div class="project__media has-img" style="--c1:#2a1e3a;--c2:#7d5fb0">
-            <img src="assets/work/travella/cover.jpg" alt="Travella cover" loading="lazy" decoding="async" />
-          </div>
-          <p class="project__tags">UI DESIGN • LIFESTYLE • 2024</p>
-          <h3 class="project__title"><b>→</b>Travella</h3>
-        </a>
-        <a href="#" class="project" data-slug="portfolio-website">
-          <div class="project__media has-img" style="--c1:#f26a1b;--c2:#ffd0b0">
-            <img src="assets/work/portfolio-website/cover.jpg" alt="Portfolio Website cover" loading="lazy" decoding="async" />
-          </div>
-          <p class="project__tags">UI UX • PORTFOLIO • 2025</p>
-          <h3 class="project__title"><b>→</b>Portfolio Website</h3>
-        </a>
       </div>
 
       <div class="work__more">
-        <a href="#" class="more-btn">
+        <a href="projects.html" class="more-btn" data-pt>
           <span class="more-btn__dot" aria-hidden="true"></span>
           <span class="more-btn__text">See all projects</span>
           <span class="more-btn__arrow" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M2.5 8h11m0 0L8.7 3.2M13.5 8l-4.8 4.8" /></svg></span>
@@ -256,15 +271,15 @@
           </div>
           <div>
             <p class="footer__label">Menu</p>
-            <a href="#top">Home</a><a href="#about">About</a><a href="#work">Projects</a>
+            <a href="#top">Home</a><a href="#about">About</a><a href="projects.html" data-pt>Projects</a>
           </div>
-          <form class="newsletter" onsubmit="event.preventDefault(); this.classList.add('is-done');">
+          <form class="newsletter" onsubmit="event.preventDefault(); const em = this.querySelector('input').value.trim(); location.href = 'mailto:md.rakkibul38@gmail.com?subject=' + encodeURIComponent('Subscribe to your design notes') + '&body=' + encodeURIComponent('Hi Prottoy, please add ' + em + ' to your design notes.'); this.classList.add('is-done');">
             <p class="footer__label">Subscribe to my design notes</p>
             <div class="newsletter__field">
               <input type="email" placeholder="Your email" aria-label="Your email" required />
               <button type="submit" aria-label="Subscribe">→</button>
             </div>
-            <p class="newsletter__ok">Thanks! You're on the list.</p>
+            <p class="newsletter__ok">Your email app is opening. Just hit Send to subscribe.</p>
           </form>
         </div>
 
@@ -281,9 +296,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
   <script src="https://unpkg.com/lenis@1.1.13/dist/lenis.min.js"></script>
-  <script type="module" src="main.js?v=3.23"></script>
+  <script type="module" src="main.js?v=3.41"></script>
   <script src="stories.js?v=11"></script>
-  <script src="stories-more.js?v=7"></script>
-  <script src="project.js?v=22"></script>
+  <script src="stories-more.js?v=11"></script>
+  <script src="project.js?v=32"></script>
 </body>
 </html>

@@ -18,120 +18,8 @@ const $$ = (s, el = document) => [...el.querySelectorAll(s)];
 
 $("#year").textContent = new Date().getFullYear();
 
-/* =========================================================
-   0. Showreel scenes — drawn once on canvas, reused as:
-      intro card slides (blue duotone), flying card texture,
-      and the full-colour reel slides
-   ========================================================= */
-const SCENE_W = 1600, SCENE_H = 1000;
-
-function makeScene(i) {
-  const c = document.createElement("canvas");
-  c.width = SCENE_W; c.height = SCENE_H;
-  const x = c.getContext("2d");
-  const rr = (X, Y, W, H, R, fill) => { x.beginPath(); x.roundRect(X, Y, W, H, R); x.fillStyle = fill; x.fill(); };
-  const shadow = (on, blur = 60) => {
-    x.shadowColor = on ? "rgba(0,0,0,.35)" : "transparent";
-    x.shadowBlur = on ? blur : 0; x.shadowOffsetY = on ? blur / 2 : 0;
-  };
-  const bg = (a, b) => { const g = x.createLinearGradient(0, 0, SCENE_W, SCENE_H); g.addColorStop(0, a); g.addColorStop(1, b); x.fillStyle = g; x.fillRect(0, 0, SCENE_W, SCENE_H); };
-  const glow = (cx, cy, r, col) => { const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, SCENE_W, SCENE_H); };
-  const phone = (X, Y, W, rot, accent, soft) => {
-    x.save(); x.translate(X, Y); x.rotate(rot);
-    const H = W * 2.05;
-    shadow(true); rr(-W / 2, -H / 2, W, H, W * 0.16, "#fff"); shadow(false);
-    const p = W * 0.07, iw = W - p * 2;
-    rr(-W / 2 + p, -H / 2 + p, iw, H * 0.36, W * 0.1, accent);
-    for (let k = 0; k < 3; k++) rr(-W / 2 + p, -H / 2 + p + H * 0.4 + k * H * 0.11, iw, H * 0.08, W * 0.05, soft);
-    rr(-W / 2 + p, H / 2 - p - H * 0.16, iw, H * 0.16, W * 0.08, accent);
-    x.restore();
-  };
-
-  switch (i % 5) {
-    case 0: // mobile banking screens
-      bg("#0016ec", "#7d8bff"); glow(1200, 150, 700, "rgba(255,255,255,.35)");
-      phone(470, 520, 270, -0.14, "#0016ec", "#e5e8ff");
-      phone(800, 500, 300, 0, "#ff6a8b", "#ffe3ea");
-      phone(1130, 520, 270, 0.14, "#18b47b", "#dff7ec");
-      break;
-    case 1: { // web app window with chart
-      bg("#ff7a59", "#ffd3a8"); glow(300, 900, 700, "rgba(255,255,255,.4)");
-      shadow(true, 80); rr(250, 170, 1100, 680, 28, "#fff"); shadow(false);
-      rr(250, 170, 1100, 56, [28, 28, 0, 0], "#f4f1ee");
-      ["#ff5f57", "#febc2e", "#28c840"].forEach((col, k) => { x.beginPath(); x.arc(290 + k * 30, 198, 9, 0, 7); x.fillStyle = col; x.fill(); });
-      rr(280, 250, 220, 570, 18, "#fff4ee");
-      for (let k = 0; k < 6; k++) rr(305, 280 + k * 60, 170, 28, 8, k === 1 ? "#ff7a59" : "#ffe2d6");
-      rr(530, 250, 790, 360, 18, "#fff4ee");
-      const hs = [.45, .7, .55, .9, .62, .8, .5, .95];
-      hs.forEach((h, k) => rr(570 + k * 92, 580 - h * 290, 56, h * 290, 10, k === 6 ? "#ff7a59" : "#ffc2ac"));
-      for (let k = 0; k < 3; k++) rr(530 + k * 270, 640, 250, 180, 18, k === 0 ? "#ff7a59" : "#ffe2d6");
-      break;
-    }
-    case 2: { // dark analytics dashboard
-      bg("#0d0f22", "#2c2f63"); glow(1250, 250, 600, "rgba(123,92,255,.55)"); glow(300, 850, 600, "rgba(0,212,255,.35)");
-      const card = (X, Y, W, H) => { rr(X, Y, W, H, 22, "rgba(255,255,255,.08)"); x.strokeStyle = "rgba(255,255,255,.18)"; x.lineWidth = 2; x.stroke(); };
-      card(180, 160, 380, 220); card(610, 160, 380, 220); card(1040, 160, 380, 220); card(180, 430, 1240, 420);
-      ["#7b5cff", "#00d4ff", "#ff6aa2"].forEach((col, k) => { rr(220 + k * 430, 210, 140, 22, 8, "rgba(255,255,255,.5)"); rr(220 + k * 430, 260, 220, 60, 12, col); });
-      x.beginPath(); x.moveTo(230, 760);
-      [[400, 640], [560, 700], [720, 560], [880, 610], [1040, 500], [1200, 540], [1370, 470]].forEach(([a, b]) => x.lineTo(a, b));
-      x.strokeStyle = "#00d4ff"; x.lineWidth = 10; x.lineJoin = "round"; x.stroke();
-      x.lineTo(1370, 820); x.lineTo(230, 820); x.closePath();
-      const g = x.createLinearGradient(0, 470, 0, 820); g.addColorStop(0, "rgba(0,212,255,.35)"); g.addColorStop(1, "rgba(0,212,255,0)"); x.fillStyle = g; x.fill();
-      break;
-    }
-    case 3: { // design tool canvas
-      bg("#18b47b", "#c6f3dd"); glow(800, 500, 800, "rgba(255,255,255,.35)");
-      shadow(true, 80); rr(160, 140, 1280, 720, 26, "#f7f8fa"); shadow(false);
-      rr(160, 140, 260, 720, [26, 0, 0, 26], "#fff");
-      for (let k = 0; k < 9; k++) rr(190, 190 + k * 66, k % 3 === 0 ? 200 : 170, 30, 8, k === 2 ? "#18b47b" : "#e7ecef");
-      rr(1180, 140, 260, 720, [0, 26, 26, 0], "#fff");
-      for (let k = 0; k < 7; k++) rr(1210, 190 + k * 80, 200, 44, 10, "#eef2f4");
-      shadow(true, 40); rr(560, 230, 230, 470, 30, "#fff"); rr(830, 300, 230, 470, 30, "#fff"); shadow(false);
-      rr(580, 250, 190, 170, 20, "#18b47b"); rr(850, 320, 190, 170, 20, "#7b5cff");
-      for (let k = 0; k < 3; k++) { rr(580, 440 + k * 60, 190, 36, 10, "#e3f5ec"); rr(850, 510 + k * 60, 190, 36, 10, "#ece8ff"); }
-      x.strokeStyle = "#0016ec"; x.lineWidth = 4; x.setLineDash([14, 10]); x.strokeRect(820, 290, 250, 490); x.setLineDash([]);
-      break;
-    }
-    default: { // app icon wall
-      bg("#ff4d6d", "#ffb3c1"); glow(800, 500, 700, "rgba(255,255,255,.35)");
-      x.save(); x.translate(800, 500); x.rotate(-0.22);
-      const cols = ["#0016ec", "#fff", "#111", "#7b5cff", "#ffd166", "#18b47b"];
-      for (let r = -3; r <= 3; r++) for (let q = -5; q <= 5; q++) {
-        const col = cols[Math.abs(r * 7 + q * 3) % cols.length];
-        shadow(true, 30); rr(q * 170 - 70, r * 170 - 70, 140, 140, 36, col); shadow(false);
-        x.beginPath(); x.arc(q * 170, r * 170, 26, 0, 7); x.fillStyle = col === "#fff" ? "#ff4d6d" : "rgba(255,255,255,.85)"; x.fill();
-      }
-      x.restore();
-    }
-  }
-  return c;
-}
-
-const scenes = Array.from({ length: 5 }, (_, i) => makeScene(i));
-const sceneURLs = scenes.map((c) => c.toDataURL("image/jpeg", 0.86));
-
-const introCard = $("#introCard");
-const reelMedia = $("#reelMedia");
-const fillSlides = (box) => sceneURLs.forEach((url, i) => {
-  const img = new Image(); img.src = url; img.alt = ""; img.className = "slide" + (i === 0 ? " is-active" : "");
-  box.appendChild(img);
-});
-fillSlides(introCard);
-fillSlides(reelMedia);
-
-let cardIndex = 0, reelIndex = 0, cardFrozen = false;
-const show = (box, i) => $$(".slide", box).forEach((s, k) => s.classList.toggle("is-active", k === i));
-setInterval(() => { if (!cardFrozen) show(introCard, (cardIndex = (cardIndex + 1) % scenes.length)); }, 900);
-
-let reelHover = false, reelTimer = 0;
-const reelTick = () => {
-  show(reelMedia, (reelIndex = (reelIndex + 1) % scenes.length));
-  reelTimer = setTimeout(reelTick, reelHover ? 650 : 2200);
-};
-reelTimer = setTimeout(reelTick, 2200);
-
-// ticker text for the reel edges
-$$(".ticker__track").forEach((t) => { t.innerHTML = Array(16).fill("<span><b>▶▶▶</b>PLAY REEL</span>").join(""); });
+// which page this is: the home page has the 3D hero; projects.html only shares the header, cards and footer
+const IS_HOME = !!document.getElementById("heroPanel");
 
 /* =========================================================
    1. HERO 3D (v2) — a wall of glossy "UI toys" (app tiles, pills,
@@ -139,7 +27,7 @@ $$(".ticker__track").forEach((t) => { t.innerHTML = Array(16).fill("<span><b>▶
       liquid, colour-split smear across the panel.
    ========================================================= */
 const panel = $("#heroPanel");
-const hero = createHero();
+const hero = panel ? createHero() : null;
 
 function createHero() {
   let renderer;
@@ -705,6 +593,8 @@ const ambient = (() => {
   return {
     toggle: () => (playing ? stop() : start(), playing),
     skip: () => playing && next(),
+    // the showreel turns the music down while it plays (0 = normal, 1 = silent), like Lusion's reel
+    duck: (v) => { if (ctx && playing) { master.gain.cancelScheduledValues(ctx.currentTime); master.gain.setTargetAtTime(0.3 * (1 - v), ctx.currentTime, 0.3); } },
     set onTrack(fn) { onTrack = fn; },
     get playing() { return playing; },
     get tracks() { return TRACKS.map((t) => t.name); },
@@ -740,6 +630,61 @@ soundBtn.addEventListener("click", () => {
   wave.target = on ? 6.8 : 0;
   if (!wave.raf) wave.raf = requestAnimationFrame(drawWave);
 });
+
+// Interface sounds, made in code: soft, smooth bubbles. A bubble is a round sine whose pitch slides
+// quickly upward as it rises and pops ("bloop"). Small bubble on hover, a fuller double bubble over a
+// project card, a rounder plop on press/tap. Starts after the first click/tap (browser rule).
+const uiSound = (() => {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  let ctx = null, out = null, last = 0, hovered = null;
+  const init = () => {
+    if (ctx) return;
+    ctx = new AC();
+    out = ctx.createGain(); out.gain.value = 0.7;
+    const soft = ctx.createBiquadFilter(); soft.type = "lowpass"; soft.frequency.value = 3600; soft.Q.value = 0.2;
+    // a little wet space makes the bubbles smooth and liquid instead of dry beeps
+    const len = Math.floor(ctx.sampleRate * 0.6), ir = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 5); }
+    const room = ctx.createConvolver(); room.buffer = ir;
+    const dry = ctx.createGain(); dry.gain.value = 0.85;
+    const wet = ctx.createGain(); wet.gain.value = 0.18;
+    out.connect(soft); soft.connect(dry).connect(ctx.destination); soft.connect(room).connect(wet).connect(ctx.destination);
+  };
+  const unlock = () => { init(); if (ctx.state !== "running") ctx.resume(); };
+  addEventListener("pointerdown", unlock, true); addEventListener("keydown", unlock, true);
+  const ready = () => ctx && ctx.state === "running" && !document.hidden;
+  // one bubble: pitch rises from f to f*rise with a smooth swell and fade
+  const bubble = (f, rise, dur, vol, delay = 0) => {
+    const t = ctx.currentTime + delay, o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = "sine";
+    o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * rise, t + dur * 0.8);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.25); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(out); o.start(t); o.stop(t + dur + 0.03);
+  };
+  const vary = () => 0.92 + Math.random() * 0.16;    // every bubble a little different, like real water
+  const play = {
+    tick() { bubble(520 * vary(), 2.1, 0.075, 0.045); },                                        // small bubble
+    ting() { const f = 330 * vary(); bubble(f, 2.2, 0.11, 0.05); bubble(f * 1.35, 2.0, 0.09, 0.03, 0.07); },  // double bubble
+    pop()  { bubble(240 * vary(), 2.6, 0.12, 0.08); },                                          // round plop
+  };
+  const target = (el) => el?.closest?.("a, button, [role='button'], .project__media, .reel__panel, .reelov__bar, input[type='email']");
+  document.addEventListener("pointerover", (e) => {
+    if (e.pointerType !== "mouse" || !ready()) return;
+    const el = target(e.target);
+    if (!el || el === hovered) return;
+    hovered = el;
+    const now = performance.now(); if (now - last < 60) return; last = now;
+    el.matches(".project__media") ? play.ting() : play.tick();
+  });
+  document.addEventListener("pointerout", (e) => { if (hovered && !hovered.contains(e.relatedTarget)) hovered = null; });
+  document.addEventListener("pointerdown", (e) => {
+    if (!target(e.target)) return;
+    if (ctx && ctx.state !== "running") ctx.resume().then(play.pop).catch(() => {}); else if (ctx) play.pop();
+  });
+  return play;
+})();
+if (location.search.includes("debug")) window.__uiSound = uiSound;
 
 /* =========================================================
    2. Page cursor trail — a light, glassy ripple. The cursor
@@ -847,7 +792,7 @@ if (canHover && !reduceMotion) (() => {
   const last = new THREE.Vector2(-1, -1), now = new THREE.Vector2();
   let moved = false, quietFor = 99;
   addEventListener("pointermove", (e) => {
-    if (panel.contains(e.target)) { last.set(-1, -1); return; }   // the hero has its own liquid
+    if (panel?.contains(e.target)) { last.set(-1, -1); return; }   // the hero has its own liquid
     now.set(e.clientX / innerWidth, 1 - e.clientY / innerHeight);
     moved = true;
   });
@@ -935,9 +880,9 @@ addEventListener("scroll", onScroll, { passive: true }); onScroll();
    4. Without GSAP: show everything and stop
    ========================================================= */
 if (!gsap || !ScrollTrigger) {
-  $("#loader").remove(); $("#loaderVeil").remove();
+  $("#loader")?.remove(); $("#loaderVeil")?.remove();
   document.body.classList.remove("is-loading");
-  $(".reel").classList.add("is-arrived");
+  $(".reel")?.classList.add("is-arrived");
   hero?.start();
   throw new Error("GSAP failed to load — running without scroll animations.");
 }
@@ -952,6 +897,7 @@ const REWIND = "play none none reverse";
 let lenis = null;
 if (window.Lenis && !reduceMotion) {
   lenis = new window.Lenis({ lerp: 0.085 });
+  window.__lenis = lenis;                              // project.js jumps to a card before zooming back out
   lenis.on("scroll", ScrollTrigger.update);
   gsap.ticker.add((t) => lenis.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -972,21 +918,7 @@ $$('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
   else target.scrollIntoView({ behavior: "smooth" });
 }));
 
-/* =========================================================
-   6. Loader: odometer counter + bar → logo mark → tilted
-      window opens onto the site
-   ========================================================= */
-const loader = $("#loader");
-const countEl = $("#loaderCount");
-countEl.innerHTML = [2, 10, 10].map((n) =>
-  `<span class="odo"><span class="odo__track">${Array.from({ length: n }, (_, i) => `<span>${i}</span>`).join("")}</span></span>`
-).join("");
-const odoTracks = $$(".odo__track", countEl);
-const setCount = (n) => String(n).padStart(3, "0").split("").forEach((d, i) => {
-  odoTracks[i].style.transform = `translateY(${-d}em)`;
-});
-setCount(0);
-
+// text that decodes from random characters (used by the loader label and the card tags)
 const scramble = (el, text, dur = 0.8) => {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ#/_";
   const o = { p: 0 };
@@ -1000,236 +932,6 @@ const scramble = (el, text, dur = 0.8) => {
   });
 };
 
-// ---- geometry of the loader bar and the "P" mark (all in screen px) ----
-const lg = () => {
-  const W = innerWidth, H = innerHeight, s = Math.max(20, Math.min(40, W * 0.02));
-  return { W, H, s, cx: W / 2, cy: H / 2 };
-};
-const pieceA = $("#pieceA"), pieceB = $("#pieceB"), lbTrack = $("#lbTrack");
-const setBar = (p) => {                       // progress bar = two white pieces over a dark track
-  const { s, cx, cy } = lg(), fill = p * 5 * s;
-  gsap.set(lbTrack, { x: cx - 2.5 * s, y: cy - 0.5 * s, width: 5 * s, height: s });
-  gsap.set(pieceA, { x: cx - 2.5 * s, y: cy - 0.5 * s, width: Math.min(fill, 3 * s), height: s });
-  gsap.set(pieceB, { x: cx + 0.5 * s, y: cy - 0.5 * s, width: Math.max(0, fill - 3 * s), height: s });
-};
-// outline of the "P" mark: stem on the left, square bowl on the top right
-const markPts = () => {
-  const { s, cx, cy } = lg();
-  return [[cx - 1.3 * s, cy - 1.5 * s], [cx + 1.3 * s, cy - 1.5 * s], [cx + 1.3 * s, cy + 0.1 * s],
-          [cx - 0.3 * s, cy + 0.1 * s], [cx - 0.3 * s, cy + 1.5 * s], [cx - 1.3 * s, cy + 1.5 * s]];
-};
-// the mark becomes a window: its outline grows, shears and settles into the full viewport
-const win = { t: 0 };
-const drawWindow = () => {
-  const { W, H, cx, cy } = lg(), t = win.t, m = markPts();
-  const F = [[-4, -4], [W + 4, -4], [W + 4, H + 4], [W + 4, H + 4], [W + 4, H + 4], [-4, H + 4]];
-  const shear = 0.6 * Math.sin(Math.PI * t), rot = (-7 * Math.PI / 180) * Math.sin(Math.PI * t);
-  const cs = Math.cos(rot), sn = Math.sin(rot);
-  const pts = m.map(([mx, my], i) => {
-    let x = mx + (F[i][0] - mx) * t, y = my + (F[i][1] - my) * t;
-    x += (cy - y) * shear;
-    const dx = x - cx, dy = y - cy;
-    return `${(cx + dx * cs - dy * sn).toFixed(1)} ${(cy + dx * sn + dy * cs).toFixed(1)}`;
-  });
-  loader.style.clipPath = `path(evenodd, "M0 0H${W}V${H}H0Z M${pts.join(" L")} Z")`;
-};
-
-lenis?.stop();
-gsap.set(".header .logo, .header__actions > *", { opacity: 0, y: -12 });
-gsap.set(".header__tagline .line > span", { yPercent: 110 });
-gsap.set(".markers--hero .mk", { rotate: 45, opacity: 0 });
-gsap.set("#scrollLabel", { opacity: 0 });
-gsap.set(".hero__panel", { scale: 1.12 });
-
-const prog = { p: 0 };
-setBar(0);
-const steps = [0, 3, 18, 44, 61, 83, 92, 100];
-const tl = gsap.timeline();
-steps.forEach((v, i) => {
-  const at = i === 0 ? 0 : `>${reduceMotion ? 0.02 : 0.05}`;
-  tl.add(() => setCount(v), at)
-    .to(prog, { p: v / 100, duration: reduceMotion ? 0.02 : 0.3, ease: "power2.out", onUpdate: () => setBar(prog.p) }, "<");
-});
-tl.add(() => {}, "+=0.55")
-  // the bar breaks in two: the left part swings up into the stem, the right part folds into the bowl
-  .to(lbTrack, { opacity: 0, duration: 0.3 })
-  .to(pieceA, { x: () => lg().cx - 2.3 * lg().s, y: () => lg().cy - 0.5 * lg().s, rotation: 90, duration: 0.8, ease: "expo.inOut" }, "<")
-  .to(pieceB, { x: () => lg().cx - 0.3 * lg().s, y: () => lg().cy - 1.5 * lg().s, width: () => 1.6 * lg().s, height: () => 1.6 * lg().s, duration: 0.8, ease: "expo.inOut" }, "<0.08")
-  .add(() => {}, "+=0.25")
-  // swap the white pieces for a window of the same shape, then open it
-  .add(() => { drawWindow(); gsap.set([pieceA, pieceB], { visibility: "hidden" }); hero?.start(); })
-  .to(win, { t: 1, duration: 1.45, ease: "expo.inOut", onUpdate: drawWindow })
-  .to("#loaderVeil", { opacity: 0, duration: 1.0, ease: "power2.inOut" }, "<0.35")
-  .to(".hero__panel", { scale: 1, duration: 1.8, ease: "expo.out" }, "<0.1")
-  .add(() => { loader.remove(); $("#loaderVeil").remove(); document.body.classList.remove("is-loading"); lenis?.start(); }, "-=0.6")
-  .to(".header .logo", { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, "-=1.1")
-  .to(".header__tagline .line > span", { yPercent: 0, duration: 1, stagger: 0.09, ease: "expo.out" }, "-=0.9")
-  .to(".header__actions > *", { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "expo.out" }, "-=0.9")
-  .to(".markers--hero .mk", { rotate: 0, opacity: 1, duration: 0.8, stagger: 0.06, ease: "back.out(2)" }, "-=0.8")
-  .add(() => { gsap.set("#scrollLabel", { opacity: 1 }); scramble($("#scrollLabel"), "SCROLL TO EXPLORE"); }, "-=0.6");
-if (location.search.includes("debug")) window.__loaderTL = tl;
-
-/* =========================================================
-   7. Intro: heading, words, blue tube wrapping the card
-   ========================================================= */
-gsap.from($$(".intro__title .line > span"), {
-  yPercent: 110, duration: 1.3, stagger: 0.12, ease: "expo.out",
-  scrollTrigger: { trigger: ".intro__title", start: "top 85%", toggleActions: REWIND },
-});
-$$(".fade-words").forEach((el) => {
-  el.innerHTML = el.textContent.trim().split(/\s+/).map((w) => `<span class="w">${w}</span>`).join(" ");
-  gsap.to($$(".w", el), {
-    opacity: 1, stagger: 0.08, ease: "none",
-    scrollTrigger: { trigger: el, start: "top 85%", end: "bottom 55%", scrub: true },
-  });
-});
-gsap.from(introCard, {
-  y: 80, opacity: 0, duration: 1.3, ease: "expo.out",
-  scrollTrigger: { trigger: introCard, start: "top 92%", toggleActions: REWIND },
-});
-
-const intro = $(".intro"), tube = $("#tube"), tubePaths = $$("path", tube);
-let tubeLen = 1, tubeProgress = 0;
-const buildTube = () => {
-  const s = intro.getBoundingClientRect();
-  const W = intro.clientWidth, H = intro.clientHeight + 140;
-  const t = $(".intro__title").getBoundingClientRect();
-  const c = introCard.getBoundingClientRect();
-  const R = (r) => ({ l: r.left - s.left, t: r.top - s.top, r: r.right - s.left, b: r.bottom - s.top, w: r.width, h: r.height });
-  const T = R(t), C = R(c);
-  const mobile = W < 900;
-  const d = mobile
-    ? `M ${W + 40} ${T.t - 20} C ${W * 0.7} ${T.b}, ${W * 0.95} ${C.t}, ${W * 0.6} ${C.t + C.h * 0.45}
-       C ${W * 0.35} ${C.t + C.h * 0.8}, ${C.l + 20} ${C.t + C.h * 0.75}, ${-40} ${C.t + C.h * 0.5}`
-    : `M ${-60} ${T.t + T.h * 0.1}
-       C ${W * 0.1} ${T.t - 80}, ${W * 0.22} ${T.t + T.h * 0.55}, ${W * 0.16} ${T.b + 20}
-       S ${C.l - 60} ${C.t - 10}, ${C.l - 34} ${C.t + C.h * 0.45}
-       S ${C.l + C.w * 0.25} ${C.b + 46}, ${C.l + C.w * 0.62} ${C.b + 34}
-       S ${C.r + 70} ${C.t + C.h * 0.35}, ${C.l + C.w * 0.55} ${C.t - 34}
-       S ${C.r + W * 0.16} ${C.t + 10}, ${W * 0.7} ${C.b - 10}
-       S ${W * 0.93} ${C.b + 40}, ${W * 0.96} ${H}`;
-  tube.setAttribute("viewBox", `0 0 ${W} ${H}`);
-  tubePaths.forEach((p) => p.setAttribute("d", d.replace(/\s+/g, " ")));
-  tubeLen = tubePaths[1].getTotalLength();
-  tubePaths.forEach((p) => (p.style.strokeDasharray = `${tubeLen} ${tubeLen}`));
-  drawTube();
-};
-const drawTube = () => tubePaths.forEach((p) => (p.style.strokeDashoffset = tubeLen * (1 - tubeProgress)));
-ScrollTrigger.create({
-  trigger: intro, start: "top 80%", end: "bottom 40%", scrub: 0.8,
-  onUpdate: (self) => { tubeProgress = self.progress; drawTube(); },
-});
-buildTube();
-ScrollTrigger.addEventListener("refresh", buildTube);
-
-/* =========================================================
-   8. Card → reel: the blue card lifts off, bends like a
-      sheet, loses its duotone and lands as the showreel
-   ========================================================= */
-const reel = $("#reel"), reelPanel = $("#reelPanel");
-const flyer = createFlyer();
-
-function createFlyer() {
-  const cv = $("#flyer");
-  let r;
-  try { r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch (e) { return null; }
-  r.setPixelRatio(Math.min(devicePixelRatio, 2));
-  const scene = new THREE.Scene();
-  const cam = new THREE.PerspectiveCamera(30, 1, 1, 10000);
-  const textures = scenes.map((c) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; });
-  const mat = new THREE.ShaderMaterial({
-    transparent: true,
-    uniforms: { uTex: { value: textures[0] }, uDuo: { value: 1 }, uBend: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1) }, uRadius: { value: 18 } },
-    vertexShader: `
-      uniform float uBend; uniform vec2 uSize; varying vec2 vUv;
-      void main(){
-        vUv = uv; vec3 p = position;
-        float b = uBend;
-        p.z += b * (sin(uv.y * 3.1416) * 0.18 + pow(1.0 - uv.x, 2.0) * 0.5);
-        float on = clamp(b / max(uSize.x * 0.32, 1.0), 0.0, 1.0);
-        p.y += pow(uv.x, 2.0) * 0.14 * on;
-        p.x += sin(uv.y * 3.1416) * 0.05 * on;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
-      }`,
-    fragmentShader: `
-      uniform sampler2D uTex; uniform float uDuo, uRadius; uniform vec2 uSize; varying vec2 vUv;
-      void main(){
-        vec2 px = vUv * uSize, h = uSize * 0.5;
-        vec2 q = abs(px - h) - (h - uRadius);
-        if (length(max(q, 0.0)) > uRadius) discard;
-        vec3 c = texture2D(uTex, vUv).rgb;
-        float l = dot(c, vec3(0.299, 0.587, 0.114));
-        vec3 duo = mix(vec3(0.0, 0.008, 0.836), vec3(0.67, 0.71, 1.0), l);
-        gl_FragColor = vec4(mix(c, duo, uDuo), 1.0);
-        #include <colorspace_fragment>
-      }`,
-  });
-  const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 40, 40), mat);
-  scene.add(mesh);
-
-  const size = () => {
-    r.setSize(innerWidth, innerHeight, false);
-    cam.aspect = innerWidth / innerHeight;
-    cam.position.z = innerHeight / 2 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
-    cam.updateProjectionMatrix();
-  };
-  size(); addEventListener("resize", size);
-
-  const lerp = (a, b, t) => a + (b - a) * t;
-  return {
-    setTexture(i) { mat.uniforms.uTex.value = textures[i]; },
-    render(p) {
-      const a = introCard.getBoundingClientRect(), b = reelPanel.getBoundingClientRect();
-      const t = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-      const w = lerp(a.width, b.width, t), h = lerp(a.height, b.height, t);
-      const x = lerp(a.left + a.width / 2, b.left + b.width / 2, t);
-      const y = lerp(a.top + a.height / 2, b.top + b.height / 2, t);
-      const bend = Math.sin(t * Math.PI);
-      mesh.scale.set(w, h, 1);
-      mesh.position.set(x - innerWidth / 2, innerHeight / 2 - y, 0);
-      mesh.rotation.set(-0.18 * bend, 0.32 * bend, -0.07 * bend);
-      mat.uniforms.uBend.value = bend * w * 0.32;
-      mat.uniforms.uSize.value.set(w, h);
-      mat.uniforms.uDuo.value = 1 - THREE.MathUtils.smoothstep(p, 0.3, 0.85);
-      r.render(scene, cam);
-    },
-  };
-}
-
-const flyerCanvas = $("#flyer");
-let flying = false;
-const setFlight = (p) => {
-  if (!flyer) { reel.classList.toggle("is-arrived", p > 0.5); return; }
-  const inFlight = p > 0.001 && p < 0.999;
-  if (inFlight && !flying) { cardFrozen = true; flyer.setTexture(cardIndex); show(reelMedia, (reelIndex = cardIndex)); }
-  if (!inFlight && p <= 0.001) cardFrozen = false;
-  flying = inFlight;
-  flyerCanvas.classList.toggle("is-on", inFlight);
-  introCard.style.visibility = p > 0.001 ? "hidden" : "visible";
-  reel.classList.toggle("is-arrived", p >= 0.999);
-  if (inFlight) flyer.render(p);
-};
-const flightST = ScrollTrigger.create({
-  trigger: reel, start: "top 92%", end: "top 14%", scrub: 0.7,
-  onUpdate: (self) => setFlight(self.progress),
-  onRefresh: (self) => setFlight(self.progress),
-});
-// keep the flying card glued to the layout while smooth-scrolling
-gsap.ticker.add(() => { if (flying) flyer?.render(flightST.progress); });
-
-// reel title: faint words drift in and settle
-gsap.timeline({ scrollTrigger: { trigger: reel, start: "top 92%", end: "top 14%", scrub: 0.7 } })
-  .fromTo("#reelLeft", { xPercent: 40, opacity: 0.25 }, { xPercent: 0, opacity: 1, ease: "none" }, 0)
-  .fromTo("#reelRight", { xPercent: -40, opacity: 0.25 }, { xPercent: 0, opacity: 1, ease: "none" }, 0)
-  .fromTo(".reel__play", { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, ease: "none" }, 0.55);
-
-// hover: faster clip cycling + "PLAY REEL" tickers on the edges
-reel.addEventListener("pointerenter", () => {
-  reel.classList.add("is-hover"); reelHover = true;
-  clearTimeout(reelTimer); reelTimer = setTimeout(reelTick, 300);
-});
-reel.addEventListener("pointerleave", () => { reel.classList.remove("is-hover"); reelHover = false; });
-
 /* =========================================================
    9. Work + footer (unchanged behaviour)
    ========================================================= */
@@ -1237,6 +939,124 @@ $$(".section-title").forEach((el) => gsap.from($$(".line > span", el), {
   yPercent: 110, duration: 1.3, stagger: 0.12, ease: "expo.out",
   scrollTrigger: { trigger: el, start: "top 85%", toggleActions: REWIND },
 }));
+// Spatial (depth) layer for the Featured Work covers, like the iPhone "spatial scene": each cover has
+// a depth map (assets/work/<slug>/depth.jpg, white = near) and, while hovered, one shared WebGL canvas
+// sits over the picture and shifts near things more than far things as the mouse moves. It matches the
+// CSS picture exactly at rest, so it fades in/out seamlessly; if WebGL or a depth map fails, nothing changes.
+const depthLayer = (() => {
+  if (!canHover || reduceMotion) return null;        // mouse only, like the rest of the hover effect
+  const cvs = document.createElement("canvas"); cvs.className = "project__depth";
+  const gl = cvs.getContext("webgl", { premultipliedAlpha: false, antialias: false });
+  if (!gl) return null;
+  const sh = (type, src) => { const s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return s; };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, `attribute vec2 p; varying vec2 v;
+    void main(){ v = vec2(p.x * .5 + .5, .5 - p.y * .5); gl_Position = vec4(p, 0., 1.); }`));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, `precision mediump float; varying vec2 v;
+    uniform sampler2D uImg, uDep; uniform vec2 uM; uniform float uA, uCard, uPic, uFocus, uAct; uniform vec3 uBg;
+    vec2 cover(vec2 q){ vec2 uv = q;            // object-fit: cover + focus
+      if (uPic < uCard) { float h = uCard / uPic; uv.y = (q.y + (h - 1.) * uFocus) / h; }
+      else { float w = uPic / uCard; uv.x = (q.x + (w - 1.) * .5) / w; }
+      return uv; }
+    float dep(vec2 uv){ return texture2D(uDep, clamp(uv, 0., 1.)).r; }
+    void main(){
+      // undo the CSS hover move (translate + scale about the centre)
+      vec2 q = (v - .5 - vec2(-uM.x, -uM.y) * .022) / (1. + uA * .07) + .5;
+      vec2 uv = cover(q);
+      // depth parallax: near (white) parts slide with the mouse, far parts the other way
+      vec2 base = uv, k = uM * uA * vec2(.03, .03 * uPic);
+      for (int i = 0; i < 4; i++) uv = base - k * (dep(uv) - .5);
+      if (uAct < .001) { gl_FragColor = texture2D(uImg, clamp(uv, 0., 1.)); return; }
+      // opening a project (Lusion-style): the camera flies into the picture, near parts rushing
+      // toward it faster than far ones, it goes soft, and the far parts melt into the project colour first
+      vec2 c = cover(vec2(.5)), b = uv; float d = dep(uv);
+      for (int i = 0; i < 3; i++) { d = dep(uv); uv = c + (b - c) / (1. + uAct * 2.2 * d); }
+      float r = uAct * .018, ang = fract(sin(dot(v, vec2(12.9898, 78.233))) * 43758.5453) * 6.2832;
+      vec3 col = vec3(0.);
+      for (int i = 0; i < 6; i++) { float rr = sqrt((float(i) + .5) / 6.) * r; ang += 2.39996;
+        col += texture2D(uImg, clamp(uv + rr * vec2(cos(ang) / uPic, sin(ang)), 0., 1.)).rgb; }
+      col /= 6.;
+      float f = clamp((uAct * 2.5 - .75 - d) / .75, 0., 1.);   // our maps: white = near, so far (dark) goes first
+      gl_FragColor = vec4(mix(col, uBg, f), 1.);
+    }`));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(prog, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const U = (n) => gl.getUniformLocation(prog, n);
+  gl.uniform1i(U("uImg"), 0); gl.uniform1i(U("uDep"), 1);
+  const tex = (unit, src) => {
+    const t = gl.createTexture(); gl.activeTexture(gl.TEXTURE0 + unit); gl.bindTexture(gl.TEXTURE_2D, t);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, src);
+    [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]
+      .forEach(([k, v]) => gl.texParameteri(gl.TEXTURE_2D, k, v));
+    return t;
+  };
+  // Each card's textures are made ONCE (cover shrunk to card size, off the main thread) and kept, so moving
+  // between cards never re-uploads pictures. Only the card under the mouse ("active") owns the canvas.
+  const cards = new Map();                           // media -> { ready, texs, pic, focus }
+  const KEEP = 4;                                    // keep textures for the last few cards only (GPU memory)
+  let active = null;
+  const shrink = async (img) => {
+    const w = Math.min(img.naturalWidth, 1280), h = Math.round(w * img.naturalHeight / img.naturalWidth);
+    try { return await createImageBitmap(img, { resizeWidth: w, resizeHeight: h, resizeQuality: "high" }); }
+    catch { const c = document.createElement("canvas"); c.width = w; c.height = h; c.getContext("2d").drawImage(img, 0, 0, w, h); return c; }
+  };
+  const load = async (media) => {
+    active = media;
+    if (cards.has(media)) { const e = cards.get(media); cards.delete(media); cards.set(media, e); return; }   // mark as recent
+    const img = media.querySelector("img"); if (!img) return;
+    const e = { ready: false }; cards.set(media, e);
+    try {
+      const d = new Image(); d.src = img.getAttribute("src").replace(/cover\.jpg$/, "depth.jpg");
+      await Promise.all([d.decode(), img.decode()]);
+      const pic = await shrink(img);
+      e.texs = [tex(0, pic), tex(1, d)]; pic.close?.();
+      e.pic = img.naturalWidth / img.naturalHeight;
+      e.focus = (parseFloat(getComputedStyle(img).objectPosition.split(" ")[1]) || 50) / 100;
+      e.ready = true;
+    } catch { e.fail = true; return; }
+    while (cards.size > KEEP) {                       // forget the oldest card's textures
+      const [m, old] = cards.entries().next().value;
+      if (m === active) break;
+      old.texs?.forEach((t) => gl.deleteTexture(t)); cards.delete(m);
+    }
+  };
+  const draw = (media, s) => {
+    const e = cards.get(media);
+    if (e) e.last = s;
+    render(media);
+  };
+  const render = (media) => {
+    const e = cards.get(media), s = e?.last || { x: 0, y: 0, a: 0 }, act = e?.act || 0;
+    if (media !== active || (s.a < 0.002 && act < 0.001)) { if (cvs.parentNode === media) cvs.remove(); return; }
+    if (!e || !e.ready) return;
+    const img = media.querySelector("img");
+    if (cvs.parentNode !== media) media.insertBefore(cvs, img.nextSibling);
+    const w = media.clientWidth, h = media.clientHeight, r = Math.min(devicePixelRatio || 1, 2);
+    if (cvs.width !== Math.round(w * r) || cvs.height !== Math.round(h * r)) { cvs.width = Math.round(w * r); cvs.height = Math.round(h * r); }
+    gl.viewport(0, 0, cvs.width, cvs.height);
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, e.texs[0]);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, e.texs[1]);
+    gl.uniform2f(U("uM"), s.x, s.y); gl.uniform1f(U("uA"), s.a);
+    gl.uniform1f(U("uCard"), w / h); gl.uniform1f(U("uPic"), e.pic); gl.uniform1f(U("uFocus"), e.focus);
+    gl.uniform1f(U("uAct"), act); gl.uniform3fv(U("uBg"), e.bg || [0, 0, 0]);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  };
+  // project opening/closing drives this: 0 = normal card, 1 = fully flown in and turned into `hex`
+  const act = (media, value, hex) => {
+    const e = cards.get(media); if (!e) return;
+    e.act = value;
+    if (hex) { const n = parseInt(hex.replace("#", ""), 16); e.bg = [(n >> 16 & 255) / 255, (n >> 8 & 255) / 255, (n & 255) / 255]; }
+    render(media);
+  };
+  const ready = (media) => !!cards.get(media)?.ready;
+  return { load, draw, act, ready };
+})();
+window.PV_DEPTH = depthLayer;                          // project.js uses it for the open/close transition
+
 // Featured Work cards: a colour plate shows first, the card swings in tilted from below and settles
 // over it, the tags decode from random characters and the title rises. Scrolling back up reverses it.
 $$(".project").forEach((card, i) => {
@@ -1280,6 +1100,34 @@ $$(".project").forEach((card, i) => {
   media.addEventListener("pointerenter", () => {
     gsap.fromTo(media, { filter: "blur(0px)" }, { filter: "blur(9px)", duration: 0.2, ease: "power2.in", yoyo: true, repeat: 1, overwrite: "auto" });
   });
+
+  // spatial scene: the card leans toward the mouse and the picture floats behind it like a window
+  // into depth, with a soft light that follows the pointer. Mouse only; eased so nothing snaps.
+  if (canHover && !reduceMotion) {
+    const glare = document.createElement("span"); glare.className = "project__glare";
+    media.append(glare);
+    const cur = { x: 0, y: 0, a: 0 }, to = { x: 0, y: 0, a: 0 };
+    let raf = 0;
+    const tick = () => {
+      cur.x += (to.x - cur.x) * 0.1; cur.y += (to.y - cur.y) * 0.1; cur.a += (to.a - cur.a) * 0.1;
+      media.style.setProperty("--sx", cur.x.toFixed(4));
+      media.style.setProperty("--sy", cur.y.toFixed(4));
+      media.style.setProperty("--sa", cur.a.toFixed(4));
+      // the card frame itself stays still; only the picture inside moves (depth + drift)
+      depthLayer?.draw(media, cur);                    // the depth (spatial scene) picture on top
+      const still = Math.abs(to.x - cur.x) + Math.abs(to.y - cur.y) + Math.abs(to.a - cur.a) < 0.001;
+      raf = still ? 0 : requestAnimationFrame(tick);
+    };
+    const go = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    media.addEventListener("pointerenter", () => depthLayer?.load(media));
+    media.addEventListener("pointermove", (e) => {
+      const r = media.getBoundingClientRect();
+      to.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      to.y = ((e.clientY - r.top) / r.height) * 2 - 1;
+      to.a = 1; go();
+    });
+    media.addEventListener("pointerleave", () => { to.x = 0; to.y = 0; to.a = 0; go(); });
+  }
 });
 gsap.from(".work__desc", { opacity: 0, y: 20, duration: 1, ease: "power3.out", scrollTrigger: { trigger: ".work__head", start: "top 85%", toggleActions: REWIND } });
 const word = $(".footer__word");
@@ -1300,3 +1148,578 @@ if (canHover) $$(".magnetic, .reel__play").forEach((el) => {
   });
   el.addEventListener("pointerleave", () => gsap.to(el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" }));
 });
+
+/* =========================================================
+   Page transition, built the way Lusion's works: a black layer with a window cut in the shape of
+   the P mark. Leaving a page, the window (huge, so you still see the page) shrinks and turns until
+   it is a small white P on black; the next page loads behind it; arriving, that P grows and turns
+   the other way, becomes a window again and opens onto the new page. Links with data-pt use it.
+   The home loader is skipped when you arrive this way.
+   ========================================================= */
+const ptArrived = document.documentElement.classList.contains("pt-in");
+window.__ptArrived = ptArrived;
+const pageTransition = (() => {
+  const cv = document.createElement("canvas"); cv.className = "pt"; cv.setAttribute("aria-hidden", "true");
+  document.body.appendChild(cv);
+  const ctx = cv.getContext("2d");
+  // the P (same shape as the favicon/logo), centred, in units: 2.6 wide × 3.2 tall
+  const P = [[11, 5.3], [89, 5.3], [89, 60], [41, 60], [41, 94.7], [11, 94.7]].map(([x, y]) => [(x - 50) / 30, (y - 50) / 30]);
+  let W = 0, H = 0, dpr = 1, unit = 0, c = 0;
+  const setup = () => {
+    dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+    unit = Math.min(14, W / 90);                               // size of the small P at rest
+    c = (Math.hypot(W, H) / unit) * 1.3;                       // how much it grows to cover the screen
+  };
+  const expoInOut = (t) => (t <= 0 ? 0 : t >= 1 ? 1 : t < 0.5 ? Math.pow(2, 20 * t - 10) / 2 : (2 - Math.pow(2, -20 * t + 10)) / 2);
+  // open: 0 = small white P on black, 1 = the P is a window bigger than the screen. dir = turning direction
+  const draw = (open, dir) => {
+    const f = expoInOut(open), p = (1 + f * c) * unit;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1;
+    ctx.clearRect(0, 0, W, H);
+    if (f >= 0.999) return;
+    ctx.fillStyle = "#0b0b10"; ctx.fillRect(0, 0, W, H);
+    ctx.translate(W / 2, H / 2);
+    ctx.rotate(f * 0.9 * dir);
+    ctx.translate(0.8 * f * p, 0.6 * f * p);                   // keeps the screen inside the P's thick part as it grows
+    ctx.scale(p, p);
+    ctx.beginPath(); P.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.closePath();
+    ctx.globalCompositeOperation = "destination-out"; ctx.fill();          // cut the window
+    ctx.globalCompositeOperation = "source-over"; ctx.globalAlpha = 1 - f; ctx.fillStyle = "#fff"; ctx.fill();   // white P while small
+  };
+  const s = { open: 1 };
+  const go = (href) => {
+    setup(); cv.style.display = "block"; s.open = 1; draw(1, -1);
+    gsap.to(s, { open: 0, duration: reduceMotion ? 0.01 : 1, ease: "none", onUpdate: () => draw(s.open, -1), onComplete: () => {
+      try { sessionStorage.setItem("pt", "1"); } catch (e) { /* storage off: no reveal, still navigates */ }
+      location.href = href;
+    } });
+  };
+  const reveal = (delay = 0) => {
+    setup(); s.open = 0; draw(0, 1); cv.style.display = "block";
+    document.documentElement.classList.remove("pt-in");
+    gsap.to(s, { open: 1, duration: reduceMotion ? 0.01 : 1.1, delay, ease: "none", onUpdate: () => draw(s.open, 1), onComplete: () => (cv.style.display = "none") });
+  };
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a[data-pt]");
+    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin) return;
+    e.preventDefault();
+    if (url.pathname === location.pathname && !url.search) { lenis ? lenis.scrollTo(0, { duration: 1.2 }) : scrollTo(0, 0); return; }
+    go(url.href);
+  });
+  // Back/Forward restoring the page instantly from the browser's memory: grow the P open again
+  addEventListener("pageshow", (e) => { if (e.persisted) { gsap.killTweensOf(s); reveal(0); } });
+  return { reveal };
+})();
+// arriving through the transition: clear the pixels once this page is ready (home waits for its loader)
+if (ptArrived) queueMicrotask(() => (window.__pageReady || Promise.resolve()).then(() => pageTransition.reveal(0.05)));
+
+// Projects page title: letters rise and settle from a tilt, the count rolls up, the arrow pops (like Lusion)
+const pallTitle = $(".pall__title");
+if (pallTitle) {
+  const word = $(".pall__word", pallTitle), count = $(".pall__count", pallTitle), arrow = $(".pall__arrow", pallTitle);
+  const split = (el) => { el.innerHTML = [...el.textContent].map((c) => `<span class="pall__c"><span>${c}</span></span>`).join(""); return $$(".pall__c > span", el); };
+  const wc = split(word), cc = split(count);
+  gsap.set(wc, { yPercent: 100, rotation: 30, transformOrigin: "0% 100%" }); gsap.set(cc, { yPercent: 100 }); gsap.set(arrow, { scale: 0 });
+  const play = () => gsap.timeline({ delay: ptArrived ? 0.45 : 0.15 })
+    .to(wc, { yPercent: 0, rotation: 0, duration: 0.9, stagger: 0.035, ease: "expo.out" }, 0)
+    .to(cc, { yPercent: 0, duration: 0.9, stagger: 0.05, ease: "expo.out" }, 0.35)
+    .to(arrow, { scale: 1, duration: 1.1, ease: "elastic.out(1, 0.45)" }, 0.45);
+  play();
+}
+
+
+/* =========================================================
+   HOME ONLY — showreel scenes, loader, intro, card → reel, reel player
+   ========================================================= */
+if (IS_HOME) {
+  /* =========================================================
+     0. Showreel scenes — drawn once on canvas, reused as:
+        intro card slides (blue duotone), flying card texture,
+        and the full-colour reel slides
+     ========================================================= */
+  const SCENE_W = 1600, SCENE_H = 1000;
+
+  function makeScene(i) {
+    const c = document.createElement("canvas");
+    c.width = SCENE_W; c.height = SCENE_H;
+    const x = c.getContext("2d");
+    const rr = (X, Y, W, H, R, fill) => { x.beginPath(); x.roundRect(X, Y, W, H, R); x.fillStyle = fill; x.fill(); };
+    const shadow = (on, blur = 60) => {
+      x.shadowColor = on ? "rgba(0,0,0,.35)" : "transparent";
+      x.shadowBlur = on ? blur : 0; x.shadowOffsetY = on ? blur / 2 : 0;
+    };
+    const bg = (a, b) => { const g = x.createLinearGradient(0, 0, SCENE_W, SCENE_H); g.addColorStop(0, a); g.addColorStop(1, b); x.fillStyle = g; x.fillRect(0, 0, SCENE_W, SCENE_H); };
+    const glow = (cx, cy, r, col) => { const g = x.createRadialGradient(cx, cy, 0, cx, cy, r); g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)"); x.fillStyle = g; x.fillRect(0, 0, SCENE_W, SCENE_H); };
+    const phone = (X, Y, W, rot, accent, soft) => {
+      x.save(); x.translate(X, Y); x.rotate(rot);
+      const H = W * 2.05;
+      shadow(true); rr(-W / 2, -H / 2, W, H, W * 0.16, "#fff"); shadow(false);
+      const p = W * 0.07, iw = W - p * 2;
+      rr(-W / 2 + p, -H / 2 + p, iw, H * 0.36, W * 0.1, accent);
+      for (let k = 0; k < 3; k++) rr(-W / 2 + p, -H / 2 + p + H * 0.4 + k * H * 0.11, iw, H * 0.08, W * 0.05, soft);
+      rr(-W / 2 + p, H / 2 - p - H * 0.16, iw, H * 0.16, W * 0.08, accent);
+      x.restore();
+    };
+
+    switch (i % 5) {
+      case 0: // mobile banking screens
+        bg("#0016ec", "#7d8bff"); glow(1200, 150, 700, "rgba(255,255,255,.35)");
+        phone(470, 520, 270, -0.14, "#0016ec", "#e5e8ff");
+        phone(800, 500, 300, 0, "#ff6a8b", "#ffe3ea");
+        phone(1130, 520, 270, 0.14, "#18b47b", "#dff7ec");
+        break;
+      case 1: { // web app window with chart
+        bg("#ff7a59", "#ffd3a8"); glow(300, 900, 700, "rgba(255,255,255,.4)");
+        shadow(true, 80); rr(250, 170, 1100, 680, 28, "#fff"); shadow(false);
+        rr(250, 170, 1100, 56, [28, 28, 0, 0], "#f4f1ee");
+        ["#ff5f57", "#febc2e", "#28c840"].forEach((col, k) => { x.beginPath(); x.arc(290 + k * 30, 198, 9, 0, 7); x.fillStyle = col; x.fill(); });
+        rr(280, 250, 220, 570, 18, "#fff4ee");
+        for (let k = 0; k < 6; k++) rr(305, 280 + k * 60, 170, 28, 8, k === 1 ? "#ff7a59" : "#ffe2d6");
+        rr(530, 250, 790, 360, 18, "#fff4ee");
+        const hs = [.45, .7, .55, .9, .62, .8, .5, .95];
+        hs.forEach((h, k) => rr(570 + k * 92, 580 - h * 290, 56, h * 290, 10, k === 6 ? "#ff7a59" : "#ffc2ac"));
+        for (let k = 0; k < 3; k++) rr(530 + k * 270, 640, 250, 180, 18, k === 0 ? "#ff7a59" : "#ffe2d6");
+        break;
+      }
+      case 2: { // dark analytics dashboard
+        bg("#0d0f22", "#2c2f63"); glow(1250, 250, 600, "rgba(123,92,255,.55)"); glow(300, 850, 600, "rgba(0,212,255,.35)");
+        const card = (X, Y, W, H) => { rr(X, Y, W, H, 22, "rgba(255,255,255,.08)"); x.strokeStyle = "rgba(255,255,255,.18)"; x.lineWidth = 2; x.stroke(); };
+        card(180, 160, 380, 220); card(610, 160, 380, 220); card(1040, 160, 380, 220); card(180, 430, 1240, 420);
+        ["#7b5cff", "#00d4ff", "#ff6aa2"].forEach((col, k) => { rr(220 + k * 430, 210, 140, 22, 8, "rgba(255,255,255,.5)"); rr(220 + k * 430, 260, 220, 60, 12, col); });
+        x.beginPath(); x.moveTo(230, 760);
+        [[400, 640], [560, 700], [720, 560], [880, 610], [1040, 500], [1200, 540], [1370, 470]].forEach(([a, b]) => x.lineTo(a, b));
+        x.strokeStyle = "#00d4ff"; x.lineWidth = 10; x.lineJoin = "round"; x.stroke();
+        x.lineTo(1370, 820); x.lineTo(230, 820); x.closePath();
+        const g = x.createLinearGradient(0, 470, 0, 820); g.addColorStop(0, "rgba(0,212,255,.35)"); g.addColorStop(1, "rgba(0,212,255,0)"); x.fillStyle = g; x.fill();
+        break;
+      }
+      case 3: { // design tool canvas
+        bg("#18b47b", "#c6f3dd"); glow(800, 500, 800, "rgba(255,255,255,.35)");
+        shadow(true, 80); rr(160, 140, 1280, 720, 26, "#f7f8fa"); shadow(false);
+        rr(160, 140, 260, 720, [26, 0, 0, 26], "#fff");
+        for (let k = 0; k < 9; k++) rr(190, 190 + k * 66, k % 3 === 0 ? 200 : 170, 30, 8, k === 2 ? "#18b47b" : "#e7ecef");
+        rr(1180, 140, 260, 720, [0, 26, 26, 0], "#fff");
+        for (let k = 0; k < 7; k++) rr(1210, 190 + k * 80, 200, 44, 10, "#eef2f4");
+        shadow(true, 40); rr(560, 230, 230, 470, 30, "#fff"); rr(830, 300, 230, 470, 30, "#fff"); shadow(false);
+        rr(580, 250, 190, 170, 20, "#18b47b"); rr(850, 320, 190, 170, 20, "#7b5cff");
+        for (let k = 0; k < 3; k++) { rr(580, 440 + k * 60, 190, 36, 10, "#e3f5ec"); rr(850, 510 + k * 60, 190, 36, 10, "#ece8ff"); }
+        x.strokeStyle = "#0016ec"; x.lineWidth = 4; x.setLineDash([14, 10]); x.strokeRect(820, 290, 250, 490); x.setLineDash([]);
+        break;
+      }
+      default: { // app icon wall
+        bg("#ff4d6d", "#ffb3c1"); glow(800, 500, 700, "rgba(255,255,255,.35)");
+        x.save(); x.translate(800, 500); x.rotate(-0.22);
+        const cols = ["#0016ec", "#fff", "#111", "#7b5cff", "#ffd166", "#18b47b"];
+        for (let r = -3; r <= 3; r++) for (let q = -5; q <= 5; q++) {
+          const col = cols[Math.abs(r * 7 + q * 3) % cols.length];
+          shadow(true, 30); rr(q * 170 - 70, r * 170 - 70, 140, 140, 36, col); shadow(false);
+          x.beginPath(); x.arc(q * 170, r * 170, 26, 0, 7); x.fillStyle = col === "#fff" ? "#ff4d6d" : "rgba(255,255,255,.85)"; x.fill();
+        }
+        x.restore();
+      }
+    }
+    return c;
+  }
+
+  const scenes = Array.from({ length: 5 }, (_, i) => makeScene(i));
+  const sceneURLs = scenes.map((c) => c.toDataURL("image/jpeg", 0.86));
+
+  const introCard = $("#introCard");
+  const reelMedia = $("#reelMedia");
+  const fillSlides = (box) => sceneURLs.forEach((url, i) => {
+    const img = new Image(); img.src = url; img.alt = ""; img.className = "slide" + (i === 0 ? " is-active" : "");
+    box.appendChild(img);
+  });
+  fillSlides(introCard);
+  fillSlides(reelMedia);
+
+  let cardIndex = 0, reelIndex = 0, cardFrozen = false;
+  const show = (box, i) => $$(".slide", box).forEach((s, k) => s.classList.toggle("is-active", k === i));
+  setInterval(() => { if (!cardFrozen) show(introCard, (cardIndex = (cardIndex + 1) % scenes.length)); }, 900);
+
+  let reelHover = false, reelTimer = 0;
+  const reelTick = () => {
+    show(reelMedia, (reelIndex = (reelIndex + 1) % scenes.length));
+    reelTimer = setTimeout(reelTick, reelHover ? 650 : 2200);
+  };
+  reelTimer = setTimeout(reelTick, 2200);
+
+  // ticker text for the reel edges
+  $$(".ticker__track").forEach((t) => { t.innerHTML = Array(16).fill("<span><b>▶▶▶</b>PLAY REEL</span>").join(""); });
+
+  /* =========================================================
+     6. Loader: odometer counter + bar → logo mark → tilted
+        window opens onto the site
+     ========================================================= */
+  const loader = $("#loader");
+  const countEl = $("#loaderCount");
+  // odometer like Lusion's: each digit holds just two numbers (this one and the next) and slides between
+  // them by the exact fraction, so it rolls through every number continuously. Each digit's value chases
+  // the count with exponential smoothing (1 - e^(-7·dt)), so it never stops and restarts.
+  countEl.innerHTML = [0, 1, 2].map(() => `<span class="odo"><span class="odo__track"><span>0</span><span>1</span></span></span>`).join("");
+  const odo = $$(".odo__track", countEl).map((el) => ({ el, a: el.children[0], b: el.children[1], v: 0, f: 0 }));
+  const count = { v: 0 };
+  const odoTick = (time, dms) => {
+    if (!countEl.isConnected) { gsap.ticker.remove(odoTick); return; }
+    const k = 1 - Math.exp(-7 * Math.min(dms, 100) / 1000);
+    odo.forEach((d, i) => {
+      const c = Math.floor(count.v / 10 ** (2 - i) + 1e-6);
+      d.v += (c - d.v) * k; if (Math.abs(c - d.v) < 0.01) d.v = c;
+      const u = d.v % 10, f = Math.floor(u), g = u - f;
+      if (f !== d.f) { d.f = f; d.a.textContent = f; d.b.textContent = (f + 1) % 10; }
+      d.el.style.transform = `translateY(${(-g * 50).toFixed(3)}%)`;
+    });
+  };
+  gsap.ticker.add(odoTick);
+
+
+  // ---- geometry of the loader bar and the "P" mark (all in screen px) ----
+  const lg = () => {
+    const W = innerWidth, H = innerHeight, s = Math.max(20, Math.min(40, W * 0.02));
+    return { W, H, s, cx: W / 2, cy: H / 2 };
+  };
+  const pieceA = $("#pieceA"), pieceB = $("#pieceB"), lbTrack = $("#lbTrack");
+  const setBar = (p) => {                       // progress bar = two white pieces over a dark track
+    const { s, cx, cy } = lg(), fill = p * 5 * s;
+    gsap.set(lbTrack, { x: cx - 2.5 * s, y: cy - 0.5 * s, width: 5 * s, height: s });
+    gsap.set(pieceA, { x: cx - 2.5 * s, y: cy - 0.5 * s, width: Math.min(fill, 3 * s), height: s });
+    gsap.set(pieceB, { x: cx + 0.5 * s, y: cy - 0.5 * s, width: Math.max(0, fill - 3 * s), height: s });
+  };
+  // outline of the "P" mark: stem on the left, square bowl on the top right
+  const markPts = () => {
+    const { s, cx, cy } = lg();
+    return [[cx - 1.3 * s, cy - 1.5 * s], [cx + 1.3 * s, cy - 1.5 * s], [cx + 1.3 * s, cy + 0.1 * s],
+            [cx - 0.3 * s, cy + 0.1 * s], [cx - 0.3 * s, cy + 1.5 * s], [cx - 1.3 * s, cy + 1.5 * s]];
+  };
+  // the mark becomes a window: its outline grows, shears and settles into the full viewport
+  const win = { t: 0 };
+  const drawWindow = () => {
+    const { W, H, cx, cy } = lg(), t = win.t, m = markPts();
+    const F = [[-4, -4], [W + 4, -4], [W + 4, H + 4], [W + 4, H + 4], [W + 4, H + 4], [-4, H + 4]];
+    const shear = 0.6 * Math.sin(Math.PI * t), rot = (-7 * Math.PI / 180) * Math.sin(Math.PI * t);
+    const cs = Math.cos(rot), sn = Math.sin(rot);
+    const pts = m.map(([mx, my], i) => {
+      let x = mx + (F[i][0] - mx) * t, y = my + (F[i][1] - my) * t;
+      x += (cy - y) * shear;
+      const dx = x - cx, dy = y - cy;
+      return `${(cx + dx * cs - dy * sn).toFixed(1)} ${(cy + dx * sn + dy * cs).toFixed(1)}`;
+    });
+    loader.style.clipPath = `path(evenodd, "M0 0H${W}V${H}H0Z M${pts.join(" L")} Z")`;
+  };
+
+  lenis?.stop();
+  gsap.set(".header .logo, .header__actions > *", { opacity: 0, y: -12 });
+  gsap.set(".header__tagline .line > span", { yPercent: 110 });
+  gsap.set(".markers--hero .mk", { rotate: 45, opacity: 0 });
+  gsap.set("#scrollLabel", { opacity: 0 });
+  gsap.set(".hero__panel", { scale: 1.12 });
+
+  const prog = { p: 0 };
+  setBar(0);
+  const steps = [0, 3, 18, 44, 61, 83, 92, 100];
+  const tl = gsap.timeline();
+  steps.forEach((v, i) => {
+    const at = i === 0 ? 0 : `>${reduceMotion ? 0.02 : 0.05}`;
+    tl.to(prog, { p: v / 100, duration: reduceMotion ? 0.02 : 0.3, ease: "power2.out", onUpdate: () => { setBar(prog.p); count.v = prog.p * 100; } }, at);
+  });
+  tl.add(() => {}, "+=0.55")
+    // the bar breaks in two: the left part swings up into the stem, the right part folds into the bowl
+    .to(lbTrack, { opacity: 0, duration: 0.3 })
+    .to(pieceA, { x: () => lg().cx - 2.3 * lg().s, y: () => lg().cy - 0.5 * lg().s, rotation: 90, duration: 0.8, ease: "expo.inOut" }, "<")
+    .to(pieceB, { x: () => lg().cx - 0.3 * lg().s, y: () => lg().cy - 1.5 * lg().s, width: () => 1.6 * lg().s, height: () => 1.6 * lg().s, duration: 0.8, ease: "expo.inOut" }, "<0.08")
+    .add(() => {}, "+=0.25")
+    // swap the white pieces for a window of the same shape, then open it
+    .add(() => { drawWindow(); gsap.set([pieceA, pieceB], { visibility: "hidden" }); hero?.start(); })
+    .to(win, { t: 1, duration: 1.45, ease: "expo.inOut", onUpdate: drawWindow })
+    .to("#loaderVeil", { opacity: 0, duration: 1.0, ease: "power2.inOut" }, "<0.35")
+    .to(".hero__panel", { scale: 1, duration: 1.8, ease: "expo.out" }, "<0.1")
+    .add(() => { loader.remove(); $("#loaderVeil").remove(); document.body.classList.remove("is-loading"); lenis?.start(); }, "-=0.6")
+    .to(".header .logo", { opacity: 1, y: 0, duration: 0.8, ease: "expo.out" }, "-=1.1")
+    .to(".header__tagline .line > span", { yPercent: 0, duration: 1, stagger: 0.09, ease: "expo.out" }, "-=0.9")
+    .to(".header__actions > *", { opacity: 1, y: 0, duration: 0.8, stagger: 0.08, ease: "expo.out" }, "-=0.9")
+    .to(".markers--hero .mk", { rotate: 0, opacity: 1, duration: 0.8, stagger: 0.06, ease: "back.out(2)" }, "-=0.8")
+    .add(() => { gsap.set("#scrollLabel", { opacity: 1 }); scramble($("#scrollLabel"), "SCROLL TO EXPLORE"); }, "-=0.6");
+  if (location.search.includes("debug")) window.__loaderTL = tl;
+  // coming back from another page of the site: the pixels cover the screen, so run the loader in a blink
+  if (ptArrived) tl.timeScale(30);
+  // ?to=about (from the other page's menu): once the page is ready, land on that section
+  const loaded = document.readyState === "complete" ? Promise.resolve() : new Promise((r) => addEventListener("load", r, { once: true }));
+  window.__pageReady = Promise.all([loaded, new Promise((r) => tl.eventCallback("onComplete", r))]).then(() => {
+    const to = new URLSearchParams(location.search).get("to"), el = to && document.getElementById(to);
+    if (el) { lenis ? lenis.scrollTo(el, { immediate: true, force: true }) : el.scrollIntoView(); history.replaceState(null, "", location.pathname); }
+  });
+
+  /* =========================================================
+     7. Intro: heading, words, blue tube wrapping the card
+     ========================================================= */
+  gsap.from($$(".intro__title .line > span"), {
+    yPercent: 110, duration: 1.3, stagger: 0.12, ease: "expo.out",
+    scrollTrigger: { trigger: ".intro__title", start: "top 85%", toggleActions: REWIND },
+  });
+  $$(".fade-words").forEach((el) => {
+    el.innerHTML = el.textContent.trim().split(/\s+/).map((w) => `<span class="w">${w}</span>`).join(" ");
+    gsap.to($$(".w", el), {
+      opacity: 1, stagger: 0.08, ease: "none",
+      scrollTrigger: { trigger: el, start: "top 85%", end: "bottom 55%", scrub: true },
+    });
+  });
+  gsap.from(introCard, {
+    y: 80, opacity: 0, duration: 1.3, ease: "expo.out",
+    scrollTrigger: { trigger: introCard, start: "top 92%", toggleActions: REWIND },
+  });
+
+  const intro = $(".intro"), tube = $("#tube"), tubePaths = $$("path", tube);
+  let tubeLen = 1, tubeProgress = 0;
+  const buildTube = () => {
+    const s = intro.getBoundingClientRect();
+    const W = intro.clientWidth, H = intro.clientHeight + 140;
+    const t = $(".intro__title").getBoundingClientRect();
+    const c = introCard.getBoundingClientRect();
+    const R = (r) => ({ l: r.left - s.left, t: r.top - s.top, r: r.right - s.left, b: r.bottom - s.top, w: r.width, h: r.height });
+    const T = R(t), C = R(c);
+    const mobile = W < 900;
+    const d = mobile
+      ? `M ${W + 40} ${T.t - 20} C ${W * 0.7} ${T.b}, ${W * 0.95} ${C.t}, ${W * 0.6} ${C.t + C.h * 0.45}
+         C ${W * 0.35} ${C.t + C.h * 0.8}, ${C.l + 20} ${C.t + C.h * 0.75}, ${-40} ${C.t + C.h * 0.5}`
+      : `M ${-60} ${T.t + T.h * 0.1}
+         C ${W * 0.1} ${T.t - 80}, ${W * 0.22} ${T.t + T.h * 0.55}, ${W * 0.16} ${T.b + 20}
+         S ${C.l - 60} ${C.t - 10}, ${C.l - 34} ${C.t + C.h * 0.45}
+         S ${C.l + C.w * 0.25} ${C.b + 46}, ${C.l + C.w * 0.62} ${C.b + 34}
+         S ${C.r + 70} ${C.t + C.h * 0.35}, ${C.l + C.w * 0.55} ${C.t - 34}
+         S ${C.r + W * 0.16} ${C.t + 10}, ${W * 0.7} ${C.b - 10}
+         S ${W * 0.93} ${C.b + 40}, ${W * 0.96} ${H}`;
+    tube.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    tubePaths.forEach((p) => p.setAttribute("d", d.replace(/\s+/g, " ")));
+    tubeLen = tubePaths[1].getTotalLength();
+    tubePaths.forEach((p) => (p.style.strokeDasharray = `${tubeLen} ${tubeLen}`));
+    colourTube(d.replace(/\s+/g, " "), W, H);
+    drawTube();
+  };
+  // the colour runs along the tube: many short segments, each a step further along the gradient
+  const TUBE_STOPS = [[0, [0, 22, 236]], [0.4, [79, 107, 255]], [0.7, [139, 163, 255]], [1, [45, 71, 255]]];   // #0016ec → #4f6bff → #8ba3ff → #2d47ff
+  const tubeColour = (t) => {
+    let i = 0; while (i < TUBE_STOPS.length - 2 && t > TUBE_STOPS[i + 1][0]) i++;
+    const [t0, a] = TUBE_STOPS[i], [t1, b] = TUBE_STOPS[i + 1], k = Math.min(1, Math.max(0, (t - t0) / (t1 - t0)));
+    return `rgb(${a.map((v, j) => Math.round(v + (b[j] - v) * k)).join(",")})`;
+  };
+  const tubeSegs = $(".tube__segs", tube);
+  const colourTube = (d, W, H) => {
+    if (!tubeSegs) return;
+    const mask = $("#tubeMask", tube);
+    Object.entries({ x: -200, y: -200, width: W + 400, height: H + 400 }).forEach(([k, v]) => mask.setAttribute(k, v));
+    const N = 160, seg = tubeLen / N, ns = "http://www.w3.org/2000/svg";
+    tubeSegs.textContent = "";
+    for (let i = 0; i < N; i++) {
+      const p = document.createElementNS(ns, "path");
+      p.setAttribute("d", d);
+      p.style.stroke = tubeColour((i + 0.5) / N);
+      p.style.strokeDasharray = `${seg} ${tubeLen * 2}`;           // round ends overlap the neighbours, so no seams show
+      p.style.strokeDashoffset = -i * seg;
+      tubeSegs.appendChild(p);
+    }
+  };
+  const drawTube = () => tubePaths.forEach((p) => (p.style.strokeDashoffset = tubeLen * (1 - tubeProgress)));
+  ScrollTrigger.create({
+    trigger: intro, start: "top 80%", end: "bottom 40%", scrub: 0.8,
+    onUpdate: (self) => { tubeProgress = self.progress; drawTube(); },
+  });
+  buildTube();
+  ScrollTrigger.addEventListener("refresh", buildTube);
+
+  /* =========================================================
+     8. Card → reel: the blue card lifts off, bends like a
+        sheet, loses its duotone and lands as the showreel
+     ========================================================= */
+  const reel = $("#reel"), reelPanel = $("#reelPanel");
+  const flyer = createFlyer();
+
+  function createFlyer() {
+    const cv = $("#flyer");
+    let r;
+    try { r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true }); } catch (e) { return null; }
+    r.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const scene = new THREE.Scene();
+    const cam = new THREE.PerspectiveCamera(30, 1, 1, 10000);
+    const textures = scenes.map((c) => { const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; });
+    const mat = new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: { uTex: { value: textures[0] }, uDuo: { value: 1 }, uBend: { value: 0 }, uSize: { value: new THREE.Vector2(1, 1) }, uRadius: { value: 18 } },
+      vertexShader: `
+        uniform float uBend; uniform vec2 uSize; varying vec2 vUv;
+        void main(){
+          vUv = uv; vec3 p = position;
+          float b = uBend;
+          p.z += b * (sin(uv.y * 3.1416) * 0.18 + pow(1.0 - uv.x, 2.0) * 0.5);
+          float on = clamp(b / max(uSize.x * 0.32, 1.0), 0.0, 1.0);
+          p.y += pow(uv.x, 2.0) * 0.14 * on;
+          p.x += sin(uv.y * 3.1416) * 0.05 * on;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+        }`,
+      fragmentShader: `
+        uniform sampler2D uTex; uniform float uDuo, uRadius; uniform vec2 uSize; varying vec2 vUv;
+        void main(){
+          vec2 px = vUv * uSize, h = uSize * 0.5;
+          vec2 q = abs(px - h) - (h - uRadius);
+          if (length(max(q, 0.0)) > uRadius) discard;
+          vec3 c = texture2D(uTex, vUv).rgb;
+          float l = dot(c, vec3(0.299, 0.587, 0.114));
+          vec3 duo = mix(vec3(0.0, 0.008, 0.836), vec3(0.67, 0.71, 1.0), l);
+          gl_FragColor = vec4(mix(c, duo, uDuo), 1.0);
+          #include <colorspace_fragment>
+        }`,
+    });
+    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 40, 40), mat);
+    scene.add(mesh);
+
+    const size = () => {
+      r.setSize(innerWidth, innerHeight, false);
+      cam.aspect = innerWidth / innerHeight;
+      cam.position.z = innerHeight / 2 / Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
+      cam.updateProjectionMatrix();
+    };
+    size(); addEventListener("resize", size);
+
+    const lerp = (a, b, t) => a + (b - a) * t;
+    return {
+      setTexture(i) { mat.uniforms.uTex.value = textures[i]; },
+      render(p) {
+        const a = introCard.getBoundingClientRect(), b = reelPanel.getBoundingClientRect();
+        const t = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+        const w = lerp(a.width, b.width, t), h = lerp(a.height, b.height, t);
+        const x = lerp(a.left + a.width / 2, b.left + b.width / 2, t);
+        const y = lerp(a.top + a.height / 2, b.top + b.height / 2, t);
+        const bend = Math.sin(t * Math.PI);
+        mesh.scale.set(w, h, 1);
+        mesh.position.set(x - innerWidth / 2, innerHeight / 2 - y, 0);
+        mesh.rotation.set(-0.18 * bend, 0.32 * bend, -0.07 * bend);
+        mat.uniforms.uBend.value = bend * w * 0.32;
+        mat.uniforms.uSize.value.set(w, h);
+        mat.uniforms.uDuo.value = 1 - THREE.MathUtils.smoothstep(p, 0.3, 0.85);
+        r.render(scene, cam);
+      },
+    };
+  }
+
+  const flyerCanvas = $("#flyer");
+  let flying = false;
+  const setFlight = (p) => {
+    if (!flyer) { reel.classList.toggle("is-arrived", p > 0.5); return; }
+    const inFlight = p > 0.001 && p < 0.999;
+    if (inFlight && !flying) { cardFrozen = true; flyer.setTexture(cardIndex); show(reelMedia, (reelIndex = cardIndex)); }
+    if (!inFlight && p <= 0.001) cardFrozen = false;
+    flying = inFlight;
+    flyerCanvas.classList.toggle("is-on", inFlight);
+    introCard.style.visibility = p > 0.001 ? "hidden" : "visible";
+    reel.classList.toggle("is-arrived", p >= 0.999);
+    if (inFlight) flyer.render(p);
+  };
+  const flightST = ScrollTrigger.create({
+    trigger: reel, start: "top 92%", end: "top 14%", scrub: 0.7,
+    onUpdate: (self) => setFlight(self.progress),
+    onRefresh: (self) => setFlight(self.progress),
+  });
+  // keep the flying card glued to the layout while smooth-scrolling
+  gsap.ticker.add(() => { if (flying) flyer?.render(flightST.progress); });
+
+  // reel title: faint words drift in and settle
+  gsap.timeline({ scrollTrigger: { trigger: reel, start: "top 92%", end: "top 14%", scrub: 0.7 } })
+    .fromTo("#reelLeft", { xPercent: 40, opacity: 0.25 }, { xPercent: 0, opacity: 1, ease: "none" }, 0)
+    .fromTo("#reelRight", { xPercent: -40, opacity: 0.25 }, { xPercent: 0, opacity: 1, ease: "none" }, 0)
+    .fromTo(".reel__play", { scale: 0.3, opacity: 0 }, { scale: 1, opacity: 1, ease: "none" }, 0.55);
+
+  // hover: faster clip cycling + "PLAY REEL" tickers on the edges
+  reel.addEventListener("pointerenter", () => {
+    reel.classList.add("is-hover"); reelHover = true;
+    clearTimeout(reelTimer); reelTimer = setTimeout(reelTick, 300);
+  });
+  reel.addEventListener("pointerleave", () => { reel.classList.remove("is-hover"); reelHover = false; });
+
+  // Full-screen showreel, like Lusion's: clicking the reel fades in a black layer, the film fills the screen,
+  // a white ✕ cursor follows the mouse (grows with speed, spins as it moves, shrinks over the controls),
+  // PAUSE · progress bar · CLOSE sit at the bottom. Click anywhere, press Esc or let it end to close.
+  const reelPlayer = (() => {
+    const ov = document.createElement("div"); ov.className = "reelov"; ov.setAttribute("aria-hidden", "true");
+    const X = `<svg viewBox="0 0 36 36" fill="none" aria-hidden="true"><path d="M8 8 28 28M28 8 8 28" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+    ov.innerHTML = `
+      <video class="reelov__video" playsinline preload="none" poster="assets/reel/poster.jpg"></video>
+      <div class="reelov__controls">
+        <button class="reelov__btn reelov__toggle" type="button">PAUSE</button>
+        <div class="reelov__bar" role="slider" aria-label="Seek"><i class="reelov__bg"></i><i class="reelov__fill"></i></div>
+        <button class="reelov__btn reelov__close" type="button">CLOSE</button>
+      </div>
+      <button class="reelov__x" type="button" aria-label="Close reel">${X}</button>
+      <div class="reelov__cursor">${X}</div>`;
+    document.body.appendChild(ov);
+    const video = $(".reelov__video", ov), fill = $(".reelov__fill", ov), bar = $(".reelov__bar", ov), toggleBtn = $(".reelov__toggle", ov);
+    const cur = $(".reelov__cursor", ov), curSvg = $("svg", cur);
+    let open = false, raf = 0, last = 0, act = 0, rotR = 0, spin = 0, spinV = 0, hoverF = 1, overControls = false;
+    const m = { x: innerWidth / 2, y: innerHeight / 2, px: innerWidth / 2, py: innerHeight / 2, ex: innerWidth / 2, ey: innerHeight / 2 };
+    ov.addEventListener("pointermove", (e) => { m.x = e.clientX; m.y = e.clientY; });
+    $$(".reelov__controls > *", ov).forEach((el) => {
+      el.addEventListener("pointerenter", () => (overControls = true));
+      el.addEventListener("pointerleave", () => (overControls = false));
+    });
+    const backOut = (t) => { const c = 1.70158; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); };
+    const backInOut = (t) => { const c = 1.70158 * 1.525; return t < 0.5 ? (Math.pow(2 * t, 2) * ((c + 1) * 2 * t - c)) / 2 : (Math.pow(2 * t - 2, 2) * ((c + 1) * (t * 2 - 2) + c) + 2) / 2; };
+    const tick = (t) => {
+      const dt = Math.min((t - (last || t)) / 1000, 0.05); last = t;
+      const k = 1 - Math.exp(-14 * dt);
+      const vx = (m.x - m.ex), vy = (m.y - m.ey);
+      m.ex += vx * k; m.ey += vy * k;                     // eased mouse
+      const speed = Math.hypot(vx, vy) * k / Math.max(dt, 1e-3) / 100;   // px per frame-ish → 0..
+      act = Math.min(1, act + dt * 1.5);
+      hoverF = Math.min(1, Math.max(0, hoverF + 4 * dt * (overControls ? -1 : 1)));
+      rotR = Math.min(1, rotR + dt * 3);
+      spinV += ((Math.max(-1, Math.min(1, -vy * k / Math.max(dt, 1e-3) / 400)) - spin) * 60 - spinV * 9) * dt;   // springy extra turn from vertical moves
+      spin += spinV * dt;
+      const s = (0.2 + 0.8 * hoverF) * Math.min(2.5, speed / 5 + 1) * backOut(act);
+      cur.style.transform = `translate3d(${m.ex}px,${m.ey}px,0) translate3d(-50%,-50%,0) scale(${s.toFixed(3)})`;
+      curSvg.style.transform = `scale(${hoverF.toFixed(3)}) rotate(${(backInOut(rotR) * 180 + spin * 75).toFixed(2)}deg)`;
+      if (video.duration) fill.style.width = `${(video.currentTime / video.duration) * 100}%`;
+      raf = open ? requestAnimationFrame(tick) : 0;
+    };
+    const show = () => {
+      if (open) return;
+      open = true; act = 0; rotR = 0; spin = spinV = 0; last = 0;
+      if (!video.src) video.src = "assets/reel/showreel.mp4";
+      video.currentTime = 0; fill.style.width = "0%"; toggleBtn.textContent = "PAUSE";
+      ov.setAttribute("aria-hidden", "false"); ov.classList.add("is-open");
+      lenis?.stop(); ambient.duck(1);
+      gsap.fromTo(ov, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.inOut", overwrite: true });
+      setTimeout(() => { if (open) video.play().catch(() => {}); }, 500);
+      if (!raf) raf = requestAnimationFrame(tick);
+    };
+    const hide = () => {
+      if (!open) return;
+      open = false; video.pause();
+      lenis?.start(); ambient.duck(0);
+      gsap.to(ov, { opacity: 0, duration: 0.5, ease: "power1.inOut", overwrite: true, onComplete: () => {
+        if (open) return;
+        ov.classList.remove("is-open"); ov.setAttribute("aria-hidden", "true"); video.currentTime = 0;
+      } });
+    };
+    ov.addEventListener("click", () => { if (innerWidth > 812) hide(); });   // desktop: click anywhere closes
+    $(".reelov__x", ov).addEventListener("click", (e) => { e.stopPropagation(); hide(); });
+    $(".reelov__close", ov).addEventListener("click", (e) => { e.stopPropagation(); hide(); });
+    toggleBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (video.paused) { video.play().catch(() => {}); toggleBtn.textContent = "PAUSE"; } else { video.pause(); toggleBtn.textContent = "PLAY"; }
+    });
+    bar.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const r = bar.getBoundingClientRect();
+      if (video.duration) video.currentTime = Math.max(0, Math.min(1, (e.clientX - r.left) / r.width)) * video.duration;
+      video.play().catch(() => {}); toggleBtn.textContent = "PAUSE";
+    });
+    video.addEventListener("ended", hide);
+    document.addEventListener("keydown", (e) => { if (open && e.key === "Escape") hide(); });
+    return { show, hide };
+  })();
+  reelPanel.addEventListener("click", (e) => { e.preventDefault(); reelPlayer.show(); });
+
+}
